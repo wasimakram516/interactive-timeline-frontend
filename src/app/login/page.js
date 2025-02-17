@@ -1,8 +1,10 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Box, TextField, Button, Typography, CircularProgress, Checkbox, FormControlLabel } from "@mui/material";
+import { Box, TextField, Button, Typography, CircularProgress, Checkbox, FormControlLabel, IconButton, InputAdornment } from "@mui/material";
 import LoginIcon from "@mui/icons-material/Login";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { login } from "@/services/authService";
 
 export default function LoginPage() {
@@ -12,6 +14,7 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -19,7 +22,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await login(email, password, rememberMe);
+      await login(email, password, rememberMe);
       router.push("/cms"); // ✅ Redirect after successful login
     } catch (err) {
       setError(err.response?.data?.message || err.message || "Login failed!");
@@ -70,11 +73,20 @@ export default function LoginPage() {
         />
         <TextField
           label="Password"
-          type="password"
+          type={showPassword ? "text" : "password"}
           fullWidth
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
 
         {error && (
