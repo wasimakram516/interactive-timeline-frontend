@@ -14,6 +14,7 @@
     "@fontsource/comfortaa": "^5.1.1",
     "@mui/icons-material": "^6.4.4",
     "@mui/material": "^6.4.4",
+    "ambient-cbg": "^1.0.4",
     "axios": "^1.7.9",
     "framer-motion": "^12.4.3",
     "next": "15.1.7",

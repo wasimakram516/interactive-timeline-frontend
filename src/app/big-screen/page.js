@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Box } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import useWebSocketBigScreen from "../../hooks/useWebSocketBigScreen";
+import { Shift } from "ambient-cbg";
 
 /**
  * Custom Hook: track window size in real time.
@@ -30,7 +31,11 @@ const reselectVariant = {
 
 const fadeInScale = {
   initial: { scale: 0.95, opacity: 0 },
-  animate: { scale: 1, opacity: 1, transition: { duration: 0.5, ease: "easeOut" } },
+  animate: {
+    scale: 1,
+    opacity: 1,
+    transition: { duration: 0.5, ease: "easeOut" },
+  },
 };
 
 export default function BigScreenPage() {
@@ -327,7 +332,7 @@ export default function BigScreenPage() {
                                 position: "absolute",
                                 width: "15rem",
                                 minHeight: "auto",
-                                top: "-20vh", 
+                                top: "-20vh",
                                 left: "50%",
                                 transform: "translateX(-50%)",
                                 color: "#000",
@@ -390,49 +395,46 @@ export default function BigScreenPage() {
 
                         {/* DESCRIPTION BELOW */}
                         {Array.isArray(event.description) &&
-                          event.description.some(
-                            (desc) => desc.trim() !== ""
-                          ) && (
-                            <motion.div
-                              ref={(el) =>
-                                (infoRefs.current[event.year].descRef = el)
-                              }
-                              variants={fadeInScale}
-                              initial="initial"
-                              animate="animate"
-                              style={{
-                                position: "absolute",
-                                width: "14rem",
-                                minHeight: "auto",
-                                top: "20vh", // ✅ Higher spacing
-                                left: "50%",
-                                transform: "translateX(-50%)",
-                                backgroundColor: "rgba(225,225,225,0.7)",
-                                color: "#333",
-                                fontSize: "1rem",
-                                padding: "1rem",
-                                textAlign: "left",
-                                overflow: "hidden",
-                                display: "flex",
-                                alignItems: "flex-start",
-                                justifyContent: "center",
-                                flexDirection: "column",
-                                borderRadius: "15px",
-                                boxShadow: "0 0 10px rgba(255,255,255,0.1)",
-                              }}
-                            >
-                              <ol style={{ paddingLeft: "1rem", margin: 0 }}>
-                                {event.description.map((point, index) => (
-                                  <li
-                                    key={index}
-                                    style={{ marginBottom: "0.3rem" }}
-                                  >
-                                    {point}
-                                  </li>
-                                ))}
-                              </ol>
-                            </motion.div>
-                          )}
+  event.description.some((desc) => desc.trim() !== "") && (
+    <motion.div
+      ref={(el) => (infoRefs.current[event.year].descRef = el)}
+      variants={fadeInScale}
+      initial="initial"
+      animate="animate"
+      style={{
+        position: "absolute",
+        width: "16rem", // ✅ Slightly wider for better readability
+        maxWidth: "20rem", // ✅ Allows some flexibility for longer text
+        minHeight: "fit-content", // ✅ Grows based on content
+        top: "140px", // ✅ Expands upwards instead of downwards
+        left: "50%",
+        transform: "translateX(-50%)",
+        backgroundColor: "rgba(225,225,225,0.85)", // ✅ Slightly more opacity for readability
+        color: "#333",
+        fontSize: "1rem",
+        padding: "1rem",
+        textAlign: "left",
+        overflowY: "visible", // ✅ Ensures content is always visible
+        wordBreak: "break-word", // ✅ Ensures long words wrap properly
+        whiteSpace: "normal", // ✅ Prevents single-line overflow
+        display: "flex",
+        alignItems: "stretch", // ✅ Allows container to expand properly
+        justifyContent: "center",
+        flexDirection: "column",
+        borderRadius: "15px",
+        boxShadow: "0 0 10px rgba(255,255,255,0.1)",
+      }}
+    >
+      <ol style={{ paddingLeft: "1rem", margin: 0, wordBreak: "break-word" }}>
+        {event.description.map((point, index) => (
+          <li key={index} style={{ marginBottom: "0.3rem" }}>
+            {point}
+          </li>
+        ))}
+      </ol>
+    </motion.div>
+  )}
+
                       </>
                     ) : (
                       <>
@@ -440,49 +442,46 @@ export default function BigScreenPage() {
 
                         {/* DESCRIPTION ABOVE */}
                         {Array.isArray(event.description) &&
-                          event.description.some(
-                            (desc) => desc.trim() !== ""
-                          ) && (
-                            <motion.div
-                              ref={(el) =>
-                                (infoRefs.current[event.year].descRef = el)
-                              }
-                              variants={fadeInScale}
-                              initial="initial"
-                              animate="animate"
-                              style={{
-                                position: "absolute",
-                                width: "14rem",
-                                minHeight: "auto",
-                                top: "-15vh", // ✅ Higher spacing
-                                left: "50%",
-                                transform: "translateX(-50%)",
-                                backgroundColor: "rgba(225,225,225,0.7)",
-                                color: "#333",
-                                fontSize: "1rem",
-                                padding: "1rem",
-                                textAlign: "left",
-                                overflow: "hidden",
-                                display: "flex",
-                                alignItems: "flex-start",
-                                justifyContent: "center",
-                                flexDirection: "column",
-                                borderRadius: "15px",
-                                boxShadow: "0 0 10px rgba(255,255,255,0.1)",
-                              }}
-                            >
-                              <ol style={{ paddingLeft: "1rem", margin: 0 }}>
-                                {event.description.map((point, index) => (
-                                  <li
-                                    key={index}
-                                    style={{ marginBottom: "0.3rem" }}
-                                  >
-                                    {point}
-                                  </li>
-                                ))}
-                              </ol>
-                            </motion.div>
-                          )}
+  event.description.some((desc) => desc.trim() !== "") && (
+    <motion.div
+      ref={(el) => (infoRefs.current[event.year].descRef = el)}
+      variants={fadeInScale}
+      initial="initial"
+      animate="animate"
+      style={{
+        position: "absolute",
+        width: "16rem", // ✅ Slightly wider for better readability
+        maxWidth: "20rem", // ✅ Allows some flexibility for longer text
+        minHeight: "fit-content", // ✅ Grows based on content
+        bottom: "40px", // ✅ Expands upwards instead of downwards
+        left: "50%",
+        transform: "translateX(-50%)",
+        backgroundColor: "rgba(225,225,225,0.85)", // ✅ Slightly more opacity for readability
+        color: "#333",
+        fontSize: "1rem",
+        padding: "1rem",
+        textAlign: "left",
+        overflowY: "visible", // ✅ Ensures content is always visible
+        wordBreak: "break-word", // ✅ Ensures long words wrap properly
+        whiteSpace: "normal", // ✅ Prevents single-line overflow
+        display: "flex",
+        alignItems: "stretch", // ✅ Allows container to expand properly
+        justifyContent: "center",
+        flexDirection: "column",
+        borderRadius: "15px",
+        boxShadow: "0 0 10px rgba(255,255,255,0.1)",
+      }}
+    >
+      <ol style={{ paddingLeft: "1rem", margin: 0, wordBreak: "break-word" }}>
+        {event.description.map((point, index) => (
+          <li key={index} style={{ marginBottom: "0.3rem" }}>
+            {point}
+          </li>
+        ))}
+      </ol>
+    </motion.div>
+  )}
+
 
                         {/* MEDIA SECTION - Displays multiple images/videos */}
                         {Array.isArray(event.media) &&
