@@ -5,7 +5,9 @@ import { io } from "socket.io-client";
 export default function useWebSocketBigScreen() {
   const [socket, setSocket] = useState(null);
   const [timelineRecords, setTimelineRecords] = useState([]);
+  const [programRecords, setProgramRecords] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedProgram, setSelectedProgram] = useState(null);
   const WS_HOST = process.env.NEXT_PUBLIC_WEBSOCKET_HOST;
 
   useEffect(() => {
@@ -21,16 +23,28 @@ export default function useWebSocketBigScreen() {
       socketInstance.emit("register", "big-screen");
     });
 
-    // ✅ Fix: Listen for "timelineUpdate" instead of "timelineData"
+    // ✅ Listen for timeline updates
     socketInstance.on("timelineUpdate", (timelineRecords) => {
       console.log("📅 Timeline updated:", timelineRecords);
       setTimelineRecords(timelineRecords);
+    });
+
+    // ✅ Listen for program updates
+    socketInstance.on("programUpdate", (programRecords) => {
+      console.log("📜 Program updated:", programRecords);
+      setProgramRecords(programRecords);
     });
 
     // ✅ Listen for selected year event
     socketInstance.on("animateYear", (eventData) => {
       console.log(`🎉 Event received for year: ${eventData.year}`);
       setSelectedEvent(eventData);
+    });
+
+    // ✅ Listen for selected program event
+    socketInstance.on("animateProgram", (programData) => {
+      console.log(`📜 Program received for title: ${programData.title}`);
+      setSelectedProgram(programData);
     });
 
     setSocket(socketInstance);
@@ -40,5 +54,5 @@ export default function useWebSocketBigScreen() {
     };
   }, [WS_HOST]);
 
-  return { timelineRecords, selectedEvent };
+  return { timelineRecords, programRecords, selectedEvent, selectedProgram };
 }

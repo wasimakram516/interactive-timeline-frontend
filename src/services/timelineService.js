@@ -20,7 +20,7 @@ export const getTimelineById = async (id) => {
   }
 };
 
-// ✅ Create a new timeline (Supports file uploads)
+// ✅ Create a new timeline (Supports media & infographic uploads)
 export const createTimeline = async (formData) => {
   try {
     const { data } = await api.post("/timelines", formData, {
@@ -32,7 +32,7 @@ export const createTimeline = async (formData) => {
   }
 };
 
-// ✅ Update a timeline (Supports file uploads)
+// ✅ Update a timeline (Supports media & infographic uploads)
 export const updateTimeline = async (id, formData) => {
   try {
     const { data } = await api.put(`/timelines/${id}`, formData, {

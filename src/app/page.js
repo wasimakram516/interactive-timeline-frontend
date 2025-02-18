@@ -4,6 +4,7 @@ import { Button, Box, Typography, IconButton } from "@mui/material";
 import ScreenShareIcon from "@mui/icons-material/ScreenShare";
 import TvIcon from "@mui/icons-material/Tv";
 import LoginIcon from "@mui/icons-material/Login"; // Import login icon
+import { Shift } from "ambient-cbg";
 
 export default function Home() {
   const router = useRouter();
@@ -17,12 +18,13 @@ export default function Home() {
         justifyContent: "center",
         height: "100vh",
         width: "100vw",
-        bgcolor: "#1e3c72",
         color: "white",
         textAlign: "center",
         position: "relative", // Ensure positioning for login button
       }}
     >
+      {/* Animated Background */}
+      <Shift />
       {/* ✅ Login Button at Top Right */}
       <IconButton
         sx={{ position: "absolute", top: 20, right: 20, color: "white" }}

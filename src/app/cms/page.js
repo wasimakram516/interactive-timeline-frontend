@@ -8,6 +8,12 @@ import {
   deleteTimeline,
 } from "../../services/timelineService";
 import {
+  getPrograms,
+  createProgram,
+  updateProgram,
+  deleteProgram,
+} from "../../services/programService";
+import {
   Box,
   Button,
   Typography,
@@ -18,201 +24,272 @@ import {
   TextField,
   IconButton,
   CircularProgress,
-  Chip,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import FileUploadIcon from "@mui/icons-material/UploadFile";
-import ImageIcon from "@mui/icons-material/Image";
-import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 
 export default function CMSPage() {
   const router = useRouter();
   const [timelines, setTimelines] = useState([]);
+  const [programs, setPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
-  const [editingTimeline, setEditingTimeline] = useState(null);
+  const [editingItem, setEditingItem] = useState(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [confirmationOpen, setConfirmationOpen] = useState(false);
-  const [timelineToDelete, setTimelineToDelete] = useState(null);
+  const [itemToDelete, setItemToDelete] = useState(null);
+  const [isEditingProgram, setIsEditingProgram] = useState(false);
+  const [activeTab, setActiveTab] = useState(0); // ✅ Tab Index (0 = Timeline, 1 = Program)
 
   const [formData, setFormData] = useState({
     year: "",
+    title: "",
+    xPosition: "",
+    yPosition: "",
     description: "",
-    media: [],
+    media: { type: "", file: null }, // ✅ Store as object { type, file }
+    infographic: { file: null }, // ✅ Store as object { file }
   });
-
+  
   useEffect(() => {
     const token = sessionStorage.getItem("accessToken");
     if (!token) return router.push("/login");
 
-    const fetchTimelines = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
-        const data = await getTimelines();
-        setTimelines(Array.isArray(data) ? data : []);
+        const timelineData = await getTimelines();
+        setTimelines(Array.isArray(timelineData) ? timelineData : []);
+
+        const programData = await getPrograms();
+        setPrograms(Array.isArray(programData) ? programData : []);
       } catch (error) {
         console.error(error);
         setTimelines([]);
+        setPrograms([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchTimelines();
+    fetchData();
   }, []);
 
-  // ✅ Trigger confirmation dialog before deleting
-  const confirmDelete = (id) => {
-    setTimelineToDelete(id);
+  const confirmDelete = (id, isProgram = false) => {
+    setItemToDelete({ id, isProgram });
     setConfirmationOpen(true);
   };
 
-  // ✅ Perform deletion after confirmation
   const handleDelete = async () => {
-    if (!timelineToDelete) return;
-    await deleteTimeline(timelineToDelete);
-    setTimelines((prev) => prev.filter((t) => t._id !== timelineToDelete));
-    setTimelineToDelete(null);
+    if (!itemToDelete) return;
+
+    if (itemToDelete.isProgram) {
+      await deleteProgram(itemToDelete.id);
+      setPrograms((prev) => prev.filter((p) => p._id !== itemToDelete.id));
+    } else {
+      await deleteTimeline(itemToDelete.id);
+      setTimelines((prev) => prev.filter((t) => t._id !== itemToDelete.id));
+    }
+
+    setItemToDelete(null);
     setConfirmationOpen(false);
   };
 
-  const handleOpenDialog = (timeline = null) => {
-    if (timeline) {
-      setEditingTimeline(timeline);
+  const handleOpenDialog = (item = null, isProgram = false) => {
+    setIsEditingProgram(isProgram);
+  
+    if (item) {
+      setEditingItem(item);
       setFormData({
-        year: timeline.year,
-        description: timeline.description?.join("\n") || "",
-        media: [],
+        year: item.year || "",
+        title: item.title || "",
+        xPosition: item.xPosition || "",
+        yPosition: item.yPosition || "",
+        description: item.description?.join("\n") || "",
+        media: item.media
+          ? { type: item.media.type, file: null } // ✅ Preserve type but reset file
+          : { type: "", file: null },
+        infographic: item.infographic
+          ? { file: null } // ✅ Reset file but keep structure
+          : { file: null },
       });
       setSelectedFiles([]);
     } else {
-      setEditingTimeline(null);
-      setFormData({ year: "", description: "", media: [] });
+      setEditingItem(null);
+      setFormData({
+        year: "",
+        title: "",
+        xPosition: "",
+        yPosition: "",
+        description: "",
+        media: { type: "", file: null },
+        infographic: { file: null },
+      });
       setSelectedFiles([]);
     }
     setOpenDialog(true);
   };
-
+  
   const handleCloseDialog = () => {
     setOpenDialog(false);
-    setEditingTimeline(null);
+    setEditingItem(null);
     setSelectedFiles([]);
   };
 
   const handleFileChange = (event) => {
-    const files = Array.from(event.target.files);
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const fileType = file.type.startsWith("image") ? "image" : "video";
   
-    if (files.length > 5) {
-      alert("You can only upload up to 5 files.");
-      return;
-    }
-  
-    setFormData({ ...formData, media: files });
-    setSelectedFiles(files.map((file) => file.name));
+    setFormData((prev) => ({
+      ...prev,
+      media: { type: fileType, file: file }, 
+    }));
   };
   
-
+  const handleInfographicChange = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+  
+    setFormData((prev) => ({
+      ...prev,
+      infographic: { file: file }, 
+    }));
+  };
+  
   const handleSubmit = async () => {
     try {
       const formattedData = new FormData();
-      formattedData.append("year", formData.year);
+  
+      // ✅ Append Year or Title
+      if (isEditingProgram) {
+        formattedData.append("title", formData.title);
+      } else {
+        formattedData.append("year", formData.year);
+      }
+  
+      formattedData.append("xPosition", formData.xPosition);
+      formattedData.append("yPosition", formData.yPosition);
+  
+      // ✅ Append Description as an Array
       formData.description
         .split("\n")
         .forEach((line) => formattedData.append("description[]", line.trim()));
-
-      Array.from(formData.media).forEach((file) => formattedData.append("files", file));
-
-      if (editingTimeline) {
-        await updateTimeline(editingTimeline._id, formattedData);
-      } else {
-        await createTimeline(formattedData);
+  
+      // ✅ Handle Media (Single File as { type, url })
+      if (formData.media?.file) {
+        formattedData.append("media", formData.media.file);
       }
-
+  
+      // ✅ Handle Infographic (Single File as { url })
+      if (formData.infographic?.file) {
+        formattedData.append("infographic", formData.infographic.file);
+      }
+  
+      // ✅ Perform API Call for Timelines or Programs
+      if (editingItem) {
+        if (isEditingProgram) {
+          await updateProgram(editingItem._id, formattedData);
+        } else {
+          await updateTimeline(editingItem._id, formattedData);
+        }
+      } else {
+        if (isEditingProgram) {
+          await createProgram(formattedData);
+        } else {
+          await createTimeline(formattedData);
+        }
+      }
+  
+      // ✅ Close Dialog & Refresh Data
       setOpenDialog(false);
-      setEditingTimeline(null);
-      
-      // ✅ Fetch updated timeline data after submitting
+      setEditingItem(null);
+  
       setLoading(true);
-      const updatedTimelines = await getTimelines();
-      setTimelines(Array.isArray(updatedTimelines) ? updatedTimelines : []);
+      const timelineData = await getTimelines();
+      setTimelines(Array.isArray(timelineData) ? timelineData : []);
+      const programData = await getPrograms();
+      setPrograms(Array.isArray(programData) ? programData : []);
       setLoading(false);
     } catch (error) {
-      console.error("Error:", error);
+      console.error("❌ Error:", error);
     }
   };
-
+  
   return (
     <Box
       sx={{
         p: 4,
-        overflowX: "clip", // ✅ Ensures no horizontal scrolling
         width: "100%",
-        maxWidth: "100vw",
+        maxWidth: "95vw",
         display: "flex",
         flexDirection: "column",
-        alignItems: "flex-start", // ✅ Centers all content properly
       }}
     >
       <Typography variant="h4" fontWeight="bold" mb={2}>
-        📝 Manage Timelines
+        📝 Manage Content
       </Typography>
 
-      <Button
-        variant="contained"
-        startIcon={<AddIcon />}
-        onClick={() => handleOpenDialog()}
-        sx={{ mb: 2 }}
+      {/* ✅ Tabs for Switching Between Timelines & Programs */}
+      <Tabs
+        value={activeTab}
+        onChange={(_, newValue) => setActiveTab(newValue)}
+        sx={{ mb: 3 }}
       >
-        Add Timeline
-      </Button>
+        <Tab label="Timelines" />
+        <Tab label="Programs" />
+      </Tabs>
+
+      {/* ✅ Button - Fixed Width & Centered */}
+      <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => handleOpenDialog(null, activeTab === 1)}
+          sx={{
+            maxWidth: "250px", // ✅ Limit button width
+            width: "100%",
+          }}
+        >
+          {activeTab === 1 ? "Add Program" : "Add Timeline"}
+        </Button>
+      </Box>
 
       {loading ? (
         <CircularProgress />
       ) : (
-        <Box sx={{ width: "100%", maxWidth: "800px", display: "flex", flexDirection: "column", gap: 2 }}>
-          {timelines.map((timeline) => (
+        <Box>
+          {(activeTab === 0 ? timelines : programs).map((item) => (
             <Box
-              key={timeline._id}
-              display="flex"
-              alignItems="center"
-              justifyContent="space-between"
+              key={item._id}
               sx={{
                 border: "1px solid #ddd",
                 p: 2,
                 borderRadius: "8px",
-                width: "100%",
-                margin: "auto", // ✅ Ensures correct centering
-                overflow: "hidden",
+                mb: 2,
               }}
             >
+              <Typography fontWeight="bold">
+                {activeTab === 1 ? "📜" : "📅"}{" "}
+                {activeTab === 1 ? item.title : item.year}
+              </Typography>
+              <Typography>{item.description?.join(", ")}</Typography>
               <Box>
-                <Typography fontWeight="bold">📅 {timeline.year}</Typography>
-                <Typography>{timeline.description?.join(", ")}</Typography>
-
-                {/* ✅ Show Existing Media (if any) */}
-                {Array.isArray(timeline.media) && timeline.media.length > 0 && (
-                  <Box display="flex" flexWrap="wrap" gap={1} mt={1}>
-                    {timeline.media.map((media, index) => (
-                      <Chip
-                        key={index}
-                        icon={media.type === "image" ? <ImageIcon /> : <VideoLibraryIcon />}
-                        label={`Media ${index + 1}`}
-                        variant="outlined"
-                        color="primary"
-                      />
-                    ))}
-                  </Box>
-                )}
-              </Box>
-
-              <Box>
-                <IconButton color="primary" onClick={() => handleOpenDialog(timeline)}>
+                <IconButton
+                  color="primary"
+                  onClick={() => handleOpenDialog(item, activeTab === 1)}
+                >
                   <EditIcon />
                 </IconButton>
-                <IconButton color="error" onClick={() => confirmDelete(timeline._id)}>
+                <IconButton
+                  color="error"
+                  onClick={() => confirmDelete(item._id, activeTab === 1)}
+                >
                   <DeleteIcon />
                 </IconButton>
               </Box>
@@ -221,57 +298,111 @@ export default function CMSPage() {
         </Box>
       )}
 
-       {/* Add/Edit Dialog */}
-       <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth>
-        <DialogTitle>{editingTimeline ? "Edit Timeline" : "Add Timeline"}</DialogTitle>
-        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mb: 2 }}>
-          <TextField
-            label="Year"
-            type="number"
-            fullWidth
-            value={formData.year}
-            onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-            required
-            sx={{mt:2}}
-          />
-          <TextField
-            label="Description (Enter each point on a new line)"
-            fullWidth
-            multiline
-            rows={4}
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            required
-          />
-          <Button variant="outlined" component="label" startIcon={<FileUploadIcon />}>
-            Upload Media (Max 5)
-            <input type="file" hidden multiple accept="image/*,video/*" onChange={handleFileChange} />
-          </Button>
+     {/* ✅ Dialog (Form) for Adding/Editing Timelines & Programs */}
+<Dialog open={openDialog} onClose={handleCloseDialog} fullWidth>
+  <DialogTitle>
+    {editingItem
+      ? isEditingProgram
+        ? "Edit Program"
+        : "Edit Timeline"
+      : isEditingProgram
+      ? "Add Program"
+      : "Add Timeline"}
+  </DialogTitle>
 
-          {/* ✅ Show Selected Files Before Uploading */}
-          {selectedFiles.length > 0 && (
-            <Box mt={1} display="flex" flexWrap="wrap" gap={1}>
-              {selectedFiles.map((file, index) => (
-                <Chip key={index} label={file} variant="outlined" color="secondary" />
-              ))}
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button variant="contained" onClick={handleSubmit}>
-            {editingTimeline ? "Update" : "Add"}
-          </Button>
-        </DialogActions>
-      </Dialog>
+  <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mb: 2 }}>
+    {/* ✅ Year Field (Only for Timelines) */}
+    {!isEditingProgram && (
+      <TextField
+        label="Year"
+        type="number"
+        fullWidth
+        value={formData.year}
+        onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+        required
+        sx={{ mt: 2 }}
+      />
+    )}
+
+    {/* ✅ Title Field (Only for Programs) */}
+    {isEditingProgram && (
+      <TextField
+        label="Title"
+        fullWidth
+        value={formData.title}
+        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+        required
+      />
+    )}
+
+    {/* ✅ Description Field (For Both) */}
+    <TextField
+      label="Description (Enter each point on a new line)"
+      fullWidth
+      multiline
+      rows={4}
+      value={formData.description}
+      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+      required
+    />
+
+    {/* ✅ X & Y Position Fields (For Both) */}
+    <TextField
+      label="X Position (% width it would occupy horizontally)"
+      type="number"
+      fullWidth
+      value={formData.xPosition}
+      onChange={(e) => setFormData({ ...formData, xPosition: e.target.value })}
+      required
+    />
+    <TextField
+      label="Y Position (%)"
+      type="number"
+      fullWidth
+      value={formData.yPosition}
+      onChange={(e) => setFormData({ ...formData, yPosition: e.target.value })}
+      required
+    />
+
+    {/* ✅ Media Upload (Image/Video) */}
+    <TextField
+      type="file"
+      fullWidth
+      InputLabelProps={{ shrink: true }}
+      inputProps={{ accept: "image/*,video/*" }}
+      onChange={handleFileChange}
+      label="Upload Media (Image/Video)"
+    />
+    {formData.media && <Typography variant="caption">Selected: {formData.media.name}</Typography>}
+
+    {/* ✅ Infographic Upload (Optional) */}
+    <TextField
+      type="file"
+      fullWidth
+      InputLabelProps={{ shrink: true }}
+      inputProps={{ accept: "image/*" }}
+      onChange={handleInfographicChange}
+      label="Upload Infographic (Optional)"
+    />
+    {formData.infographic && <Typography variant="caption">Selected: {formData.infographic.name}</Typography>}
+  </DialogContent>
+
+  <DialogActions>
+    <Button onClick={handleCloseDialog}>Cancel</Button>
+    <Button variant="contained" onClick={handleSubmit}>Submit</Button> {/* ✅ Fixed: Submit button now works */}
+  </DialogActions>
+</Dialog>
+
 
       {/* ✅ Confirmation Dialog for Delete */}
       <ConfirmationDialog
         open={confirmationOpen}
         onClose={() => setConfirmationOpen(false)}
         onConfirm={handleDelete}
-        title="Confirm Deletion"
-        message="Are you sure you want to delete this timeline?"
+        title={`Confirm Deletion`}
+        message={`Are you sure you want to delete this ${
+          itemToDelete?.isProgram ? "program" : "timeline"
+        }?`}
         confirmButtonText="Delete"
       />
     </Box>
