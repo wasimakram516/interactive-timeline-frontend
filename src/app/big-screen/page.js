@@ -10,7 +10,8 @@ import { Shift } from "ambient-cbg";
 function useWindowSize() {
   const [size, setSize] = useState({ width: 0, height: 0 });
   useEffect(() => {
-    const handleResize = () => setSize({ width: window.innerWidth, height: window.innerHeight });
+    const handleResize = () =>
+      setSize({ width: window.innerWidth, height: window.innerHeight });
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -20,7 +21,8 @@ function useWindowSize() {
 
 export default function BigScreenPage() {
   const router = useRouter();
-  const { timelineRecords, programRecords, selectedEvent, selectedProgram } = useWebSocketBigScreen();
+  const { timelineRecords, programRecords, selectedEvent, selectedProgram } =
+    useWebSocketBigScreen();
 
   const yearRefs = useRef([]);
   const programRefs = useRef([]);
@@ -76,11 +78,11 @@ export default function BigScreenPage() {
   };
 
   // --- RADIUS SETTINGS FOR EACH BUBBLE ---
-  const MAIN_BUBBLE_RADIUS = 2.5;       // ~5rem diameter => 2.5rem radius
-  const DESC_BUBBLE_RADIUS = 5;         // ~10rem diameter => 5rem radius
-  const MEDIA_BUBBLE_RADIUS = 5;        // ~10rem diameter => 5rem radius
-  const INFOGRAPHIC_BUBBLE_RADIUS = 4;  // ~8rem diameter => 4rem radius
-  const SPACING = 2;                    // Additional spacing between bubbles (rem)
+  const MAIN_BUBBLE_RADIUS = 2.5; // ~5rem diameter => 2.5rem radius
+  const DESC_BUBBLE_RADIUS = 5; // ~10rem diameter => 5rem radius
+  const MEDIA_BUBBLE_RADIUS = 5; // ~10rem diameter => 5rem radius
+  const INFOGRAPHIC_BUBBLE_RADIUS = 4; // ~8rem diameter => 4rem radius
+  const SPACING = 2; // Additional spacing between bubbles (rem)
 
   return (
     <Box
@@ -95,7 +97,13 @@ export default function BigScreenPage() {
       <Shift />
 
       <IconButton
-        sx={{ position: "absolute", top: 20, left: 20, color: "white", zIndex: 99 }}
+        sx={{
+          position: "absolute",
+          top: 20,
+          left: 20,
+          color: "white",
+          zIndex: 99,
+        }}
         onClick={() => router.push("/")}
       >
         <ArrowBackIcon />
@@ -113,7 +121,7 @@ export default function BigScreenPage() {
           const distributeEvenly = !placeBelow && !placeAbove;
 
           // We'll track how far we've stacked above & below
-          let offsetAbove = MAIN_BUBBLE_RADIUS;  // start just beyond the main bubble
+          let offsetAbove = MAIN_BUBBLE_RADIUS; // start just beyond the main bubble
           let offsetBelow = MAIN_BUBBLE_RADIUS;
 
           return (
@@ -135,18 +143,15 @@ export default function BigScreenPage() {
                   background: isActive
                     ? "linear-gradient(90deg, #0088ff, #00ffcc)"
                     : "radial-gradient(circle, #009688, #00796b)",
-                    color: isActive ? "#222" : "#fff",
-                    borderRadius:
-                      isActive ? "10px" : "50%",
-    
-                    color: isActive ? "#222" : "#fff",
-                    borderRadius:
-                      isActive ? "10px" : "50%",
-                    color: isActive ? "#000" : "#fff",
-                    minWidth: isActive ? "8rem" : "5rem",
-                    height: isActive ? "4rem" : "5rem",
-                    padding:
-                      isActive ? "1rem 1.5rem" : "1rem",
+                  color: isActive ? "#222" : "#fff",
+                  borderRadius: isActive ? "10px" : "50%",
+
+                  color: isActive ? "#222" : "#fff",
+                  borderRadius: isActive ? "10px" : "50%",
+                  color: isActive ? "#000" : "#fff",
+                  minWidth: isActive ? "8rem" : "5rem",
+                  height: isActive ? "4rem" : "5rem",
+                  padding: isActive ? "1rem 1.5rem" : "1rem",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -160,61 +165,107 @@ export default function BigScreenPage() {
               {isActive && (
                 <>
                   {/* DESCRIPTION BUBBLES */}
-                  {selectedEvent.description?.map((desc, i) => {
-                    // Decide above/below
-                    let yDir = 1; // +1 => below, -1 => above
-                    if (placeAbove) {
-                      yDir = -1;
-                    } else if (placeBelow) {
-                      yDir = 1;
-                    } else {
-                      // distributeEvenly => alternate
-                      if (i % 2 === 0) yDir = -1;
-                      else yDir = 1;
-                    }
+                  {selectedEvent.description?.length > 0 &&
+                    selectedEvent.description.some(
+                      (desc) => desc.trim() !== ""
+                    ) &&
+                    (() => {
+                      // Filter valid descriptions
+                      const validDescriptions =
+                        selectedEvent.description.filter(
+                          (desc) => desc.trim() !== ""
+                        );
 
-                    // Positioning offset
-                    let finalOffset = 0;
-                    if (yDir === -1) {
-                      // Going above
-                      finalOffset = -(offsetAbove + DESC_BUBBLE_RADIUS + SPACING);
-                      offsetAbove += DESC_BUBBLE_RADIUS * 2 + SPACING;
-                    } else {
-                      // Going below
-                      finalOffset = offsetBelow + DESC_BUBBLE_RADIUS + SPACING;
-                      offsetBelow += DESC_BUBBLE_RADIUS * 2 + SPACING;
-                    }
+                      // Don't render if there are no valid descriptions
+                      if (validDescriptions.length === 0) return null;
 
-                    return (
-                      <motion.div
-                        key={`desc-${i}`}
-                        initial={{ scale: 0.5, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ duration: 0.5 }}
-                        style={{
-                          position: "absolute",
-                          left: "50%",
-                          top: `calc(50% + ${finalOffset}rem)`,
-                          transform: "translate(-50%, -50%)",
-                          background: "linear-gradient(90deg, #0088ff, #00ffcc)",
-                          color: "#000",
-                          padding: "1rem",
-                          borderRadius: "50%",
-                          textAlign: "center",
-                          width: "12rem",
-                          height: "12rem",
-                          boxShadow: "0 0 10px rgba(0, 255, 255, 0.8)",
-                          fontSize: "1.2rem",
-                          zIndex: 20,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        {desc}
-                      </motion.div>
-                    );
-                  })}
+                      // Decide above/below
+                      let yDir = 1; // +1 => below, -1 => above
+                      if (placeAbove) {
+                        yDir = -1;
+                      } else if (placeBelow) {
+                        yDir = 1;
+                      } else {
+                        // distributeEvenly => choose the side with more space
+                        yDir = offsetBelow <= offsetAbove ? 1 : -1;
+                      }
+
+                      // Positioning offset
+                      let finalOffset = 0;
+                      if (yDir === -1) {
+                        // Going above
+                        finalOffset = -(
+                          offsetAbove +
+                          DESC_BUBBLE_RADIUS +
+                          SPACING
+                        );
+                        offsetAbove += DESC_BUBBLE_RADIUS * 2 + SPACING;
+                      } else {
+                        // Going below
+                        finalOffset =
+                          offsetBelow + DESC_BUBBLE_RADIUS + SPACING;
+                        offsetBelow += DESC_BUBBLE_RADIUS * 2 + SPACING;
+                      }
+
+                      return (
+                        <motion.div
+                          initial={{ scale: 0.5, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ duration: 0.5 }}
+                          style={{
+                            position: "absolute",
+                            left: "50%",
+                            top: `calc(50% + ${finalOffset}rem)`,
+                            transform: "translate(-50%, -50%)",
+                            background:
+                              "linear-gradient(90deg, #0088ff, #00ffcc)",
+                            color: "#000",
+                            padding: "1rem",
+                            borderRadius: "50%",
+                            textAlign: "center",
+                            width: "14rem",
+                            minHeight: "12rem",
+                            maxHeight: "16rem", // Prevents overflow
+                            boxShadow: "0 0 10px rgba(0, 255, 255, 0.8)",
+                            fontSize: "1.2rem",
+                            zIndex: 20,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexDirection: "column",
+                            overflow: "hidden", // Prevents text from spilling out
+                            wordWrap: "break-word",
+                            paddingTop: "1.5rem",
+                          }}
+                        >
+                          <ul
+                            style={{
+                              margin: 0,
+                              padding: "0 1rem",
+                              textAlign: "left",
+                              listStyle: "decimal",
+                              maxWidth: "100%",
+                              overflowWrap: "break-word", // Ensures text breaks properly
+                              wordBreak: "break-word",
+                              overflowY: "auto", // Enables scrolling for long text
+                              maxHeight: "14rem",
+                            }}
+                          >
+                            {validDescriptions.map((desc, i) => (
+                              <li
+                                key={i}
+                                style={{
+                                  marginBottom: "0.5rem",
+                                  fontSize: "1rem",
+                                }}
+                              >
+                                {desc}
+                              </li>
+                            ))}
+                          </ul>
+                        </motion.div>
+                      );
+                    })()}
 
                   {/* MEDIA BUBBLE */}
                   {selectedEvent.media?.url && (
@@ -229,11 +280,16 @@ export default function BigScreenPage() {
                         top: (() => {
                           // We'll put it below unless placeAbove is set
                           if (placeAbove) {
-                            const yVal = -(offsetAbove + MEDIA_BUBBLE_RADIUS + SPACING);
+                            const yVal = -(
+                              offsetAbove +
+                              MEDIA_BUBBLE_RADIUS +
+                              SPACING
+                            );
                             offsetAbove += MEDIA_BUBBLE_RADIUS * 2 + SPACING;
                             return `calc(50% + ${yVal}rem)`;
                           } else {
-                            const yVal = offsetBelow + MEDIA_BUBBLE_RADIUS + SPACING;
+                            const yVal =
+                              offsetBelow + MEDIA_BUBBLE_RADIUS + SPACING;
                             offsetBelow += MEDIA_BUBBLE_RADIUS * 2 + SPACING;
                             return `calc(50% + ${yVal}rem)`;
                           }
@@ -283,12 +339,19 @@ export default function BigScreenPage() {
                         // We'll place it below if top or distribute, above if bottom
                         top: (() => {
                           if (placeAbove) {
-                            const yVal = -(offsetAbove + INFOGRAPHIC_BUBBLE_RADIUS + SPACING);
-                            offsetAbove += INFOGRAPHIC_BUBBLE_RADIUS * 2 + SPACING;
+                            const yVal = -(
+                              offsetAbove +
+                              INFOGRAPHIC_BUBBLE_RADIUS +
+                              SPACING
+                            );
+                            offsetAbove +=
+                              INFOGRAPHIC_BUBBLE_RADIUS * 2 + SPACING;
                             return `calc(50% + ${yVal}rem)`;
                           } else {
-                            const yVal = offsetBelow + INFOGRAPHIC_BUBBLE_RADIUS + SPACING;
-                            offsetBelow += INFOGRAPHIC_BUBBLE_RADIUS * 2 + SPACING;
+                            const yVal =
+                              offsetBelow + INFOGRAPHIC_BUBBLE_RADIUS + SPACING;
+                            offsetBelow +=
+                              INFOGRAPHIC_BUBBLE_RADIUS * 2 + SPACING;
                             return `calc(50% + ${yVal}rem)`;
                           }
                         })(),
@@ -339,7 +402,7 @@ export default function BigScreenPage() {
 
       {/* 📌 RIGHT: Program Bubbles (30%) */}
       <Box sx={{ width: "30%", height: "100%", position: "relative" }}>
-      {programRecords.map((program, index) => {
+        {programRecords.map((program, index) => {
           const isActive = selectedProgram?.title === program.title;
           const yPosition = program.yPosition;
 
@@ -349,12 +412,12 @@ export default function BigScreenPage() {
           const distributeEvenly = !placeBelow && !placeAbove;
 
           // We'll track how far we've stacked above & below
-          let offsetAbove = MAIN_BUBBLE_RADIUS;  // start just beyond the main bubble
+          let offsetAbove = MAIN_BUBBLE_RADIUS; // start just beyond the main bubble
           let offsetBelow = MAIN_BUBBLE_RADIUS;
 
           return (
             <Box
-            key={`program-${index}`}
+              key={`program-${index}`}
               sx={{
                 position: "absolute",
                 left: `${program.xPosition}%`,
@@ -371,18 +434,15 @@ export default function BigScreenPage() {
                   background: isActive
                     ? "linear-gradient(90deg, #0088ff, #00ffcc)"
                     : "radial-gradient(circle, #009688, #00796b)",
-                    color: isActive ? "#222" : "#fff",
-                    borderRadius:
-                      isActive ? "10px" : "50%",
-    
-                    color: isActive ? "#222" : "#fff",
-                    borderRadius:
-                      isActive ? "10px" : "50%",
-                    color: isActive ? "#000" : "#fff",
-                    minWidth: isActive ? "8rem" : "5rem",
-                    height: isActive ? "4rem" : "5rem",
-                    padding:
-                      isActive ? "1rem 1.5rem" : "1rem",
+                  color: isActive ? "#222" : "#fff",
+                  borderRadius: isActive ? "10px" : "50%",
+
+                  color: isActive ? "#222" : "#fff",
+                  borderRadius: isActive ? "10px" : "50%",
+                  color: isActive ? "#000" : "#fff",
+                  minWidth: isActive ? "8rem" : "5rem",
+                  height: isActive ? "4rem" : "5rem",
+                  padding: isActive ? "1rem 1.5rem" : "1rem",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -396,61 +456,107 @@ export default function BigScreenPage() {
               {isActive && (
                 <>
                   {/* DESCRIPTION BUBBLES */}
-                  {selectedProgram.description?.map((desc, i) => {
-                    // Decide above/below
-                    let yDir = 1; // +1 => below, -1 => above
-                    if (placeAbove) {
-                      yDir = -1;
-                    } else if (placeBelow) {
-                      yDir = 1;
-                    } else {
-                      // distributeEvenly => alternate
-                      if (i % 2 === 0) yDir = -1;
-                      else yDir = 1;
-                    }
+                  {selectedProgram.description?.length > 0 &&
+                    selectedProgram.description.some(
+                      (desc) => desc.trim() !== ""
+                    ) &&
+                    (() => {
+                      // Filter valid descriptions
+                      const validDescriptions =
+                        selectedProgram.description.filter(
+                          (desc) => desc.trim() !== ""
+                        );
 
-                    // Positioning offset
-                    let finalOffset = 0;
-                    if (yDir === -1) {
-                      // Going above
-                      finalOffset = -(offsetAbove + DESC_BUBBLE_RADIUS + SPACING);
-                      offsetAbove += DESC_BUBBLE_RADIUS * 2 + SPACING;
-                    } else {
-                      // Going below
-                      finalOffset = offsetBelow + DESC_BUBBLE_RADIUS + SPACING;
-                      offsetBelow += DESC_BUBBLE_RADIUS * 2 + SPACING;
-                    }
+                      // Don't render if there are no valid descriptions
+                      if (validDescriptions.length === 0) return null;
 
-                    return (
-                      <motion.div
-                        key={`desc-${i}`}
-                        initial={{ scale: 0.5, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ duration: 0.5 }}
-                        style={{
-                          position: "absolute",
-                          left: "50%",
-                          top: `calc(50% + ${finalOffset}rem)`,
-                          transform: "translate(-50%, -50%)",
-                          background: "linear-gradient(90deg, #0088ff, #00ffcc)",
-                          color: "#000",
-                          padding: "1rem",
-                          borderRadius: "50%",
-                          textAlign: "center",
-                          width: "12rem",
-                          height: "12rem",
-                          boxShadow: "0 0 10px rgba(0, 255, 255, 0.8)",
-                          fontSize: "1.2rem",
-                          zIndex: 20,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        {desc}
-                      </motion.div>
-                    );
-                  })}
+                      // Decide above/below
+                      let yDir = 1; // +1 => below, -1 => above
+                      if (placeAbove) {
+                        yDir = -1;
+                      } else if (placeBelow) {
+                        yDir = 1;
+                      } else {
+                        // distributeEvenly => choose the side with more space
+                        yDir = offsetBelow <= offsetAbove ? 1 : -1;
+                      }
+
+                      // Positioning offset
+                      let finalOffset = 0;
+                      if (yDir === -1) {
+                        // Going above
+                        finalOffset = -(
+                          offsetAbove +
+                          DESC_BUBBLE_RADIUS +
+                          SPACING
+                        );
+                        offsetAbove += DESC_BUBBLE_RADIUS * 2 + SPACING;
+                      } else {
+                        // Going below
+                        finalOffset =
+                          offsetBelow + DESC_BUBBLE_RADIUS + SPACING;
+                        offsetBelow += DESC_BUBBLE_RADIUS * 2 + SPACING;
+                      }
+
+                      return (
+                        <motion.div
+                          initial={{ scale: 0.5, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ duration: 0.5 }}
+                          style={{
+                            position: "absolute",
+                            left: "50%",
+                            top: `calc(50% + ${finalOffset}rem)`,
+                            transform: "translate(-50%, -50%)",
+                            background:
+                              "linear-gradient(90deg, #0088ff, #00ffcc)",
+                            color: "#000",
+                            padding: "1rem",
+                            borderRadius: "50%",
+                            textAlign: "center",
+                            width: "14rem",
+                            minHeight: "12rem",
+                            maxHeight: "16rem", // Prevents overflow
+                            boxShadow: "0 0 10px rgba(0, 255, 255, 0.8)",
+                            fontSize: "1.2rem",
+                            zIndex: 20,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexDirection: "column",
+                            overflow: "hidden", // Prevents text from spilling out
+                            wordWrap: "break-word",
+                            paddingTop: "1.5rem",
+                          }}
+                        >
+                          <ul
+                            style={{
+                              margin: 0,
+                              padding: "0 1rem",
+                              textAlign: "left",
+                              listStyle: "decimal",
+                              maxWidth: "100%",
+                              overflowWrap: "break-word", // Ensures text breaks properly
+                              wordBreak: "break-word",
+                              overflowY: "auto", // Enables scrolling for long text
+                              maxHeight: "14rem",
+                            }}
+                          >
+                            {validDescriptions.map((desc, i) => (
+                              <li
+                                key={i}
+                                style={{
+                                  marginBottom: "0.5rem",
+                                  fontSize: "1rem",
+                                }}
+                              >
+                                {desc}
+                              </li>
+                            ))}
+                          </ul>
+                        </motion.div>
+                      );
+                    })()}
 
                   {/* MEDIA BUBBLE */}
                   {selectedProgram.media?.url && (
@@ -465,11 +571,16 @@ export default function BigScreenPage() {
                         top: (() => {
                           // We'll put it below unless placeAbove is set
                           if (placeAbove) {
-                            const yVal = -(offsetAbove + MEDIA_BUBBLE_RADIUS + SPACING);
+                            const yVal = -(
+                              offsetAbove +
+                              MEDIA_BUBBLE_RADIUS +
+                              SPACING
+                            );
                             offsetAbove += MEDIA_BUBBLE_RADIUS * 2 + SPACING;
                             return `calc(50% + ${yVal}rem)`;
                           } else {
-                            const yVal = offsetBelow + MEDIA_BUBBLE_RADIUS + SPACING;
+                            const yVal =
+                              offsetBelow + MEDIA_BUBBLE_RADIUS + SPACING;
                             offsetBelow += MEDIA_BUBBLE_RADIUS * 2 + SPACING;
                             return `calc(50% + ${yVal}rem)`;
                           }
@@ -519,12 +630,19 @@ export default function BigScreenPage() {
                         // We'll place it below if top or distribute, above if bottom
                         top: (() => {
                           if (placeAbove) {
-                            const yVal = -(offsetAbove + INFOGRAPHIC_BUBBLE_RADIUS + SPACING);
-                            offsetAbove += INFOGRAPHIC_BUBBLE_RADIUS * 2 + SPACING;
+                            const yVal = -(
+                              offsetAbove +
+                              INFOGRAPHIC_BUBBLE_RADIUS +
+                              SPACING
+                            );
+                            offsetAbove +=
+                              INFOGRAPHIC_BUBBLE_RADIUS * 2 + SPACING;
                             return `calc(50% + ${yVal}rem)`;
                           } else {
-                            const yVal = offsetBelow + INFOGRAPHIC_BUBBLE_RADIUS + SPACING;
-                            offsetBelow += INFOGRAPHIC_BUBBLE_RADIUS * 2 + SPACING;
+                            const yVal =
+                              offsetBelow + INFOGRAPHIC_BUBBLE_RADIUS + SPACING;
+                            offsetBelow +=
+                              INFOGRAPHIC_BUBBLE_RADIUS * 2 + SPACING;
                             return `calc(50% + ${yVal}rem)`;
                           }
                         })(),
