@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import { Box, IconButton } from "@mui/material";
+import React, { useEffect, useState, useRef } from "react";
+import { Box, IconButton, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 import useWebSocketBigScreen from "@/hooks/useWebSocketBigScreen";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -25,12 +25,16 @@ export default function BigScreenPage() {
     useWebSocketBigScreen();
 
   const yearRefs = useRef([]);
-  const programRefs = useRef([]);
   const [yearLineStyles, setYearLineStyles] = useState([]);
   const { width: windowWidth, height: windowHeight } = useWindowSize();
 
   useEffect(() => {
-    if (timelineRecords.length === 0 && programRecords.length === 0) return;
+    if (timelineRecords.length === 0) return;
+
+    // Initialize yearRefs with null values
+    yearRefs.current = Array(timelineRecords.length)
+      .fill()
+      .map((_, i) => yearRefs.current[i] || null);
 
     requestAnimationFrame(() => {
       const newYearLines = [];
@@ -60,7 +64,7 @@ export default function BigScreenPage() {
       }
       setYearLineStyles(newYearLines);
     });
-  }, [timelineRecords, programRecords, windowWidth, windowHeight]);
+  }, [timelineRecords, windowWidth, windowHeight]);
 
   // ✅ Shared Bubble Style
   const bubbleStyle = {
@@ -77,12 +81,66 @@ export default function BigScreenPage() {
     transition: "all 0.3s ease-in-out",
   };
 
-  // --- RADIUS SETTINGS FOR EACH BUBBLE ---
-  const MAIN_BUBBLE_RADIUS = 2.5; // ~5rem diameter => 2.5rem radius
-  const DESC_BUBBLE_RADIUS = 5; // ~10rem diameter => 5rem radius
-  const MEDIA_BUBBLE_RADIUS = 5; // ~10rem diameter => 5rem radius
-  const INFOGRAPHIC_BUBBLE_RADIUS = 4; // ~8rem diameter => 4rem radius
-  const SPACING = 2; // Additional spacing between bubbles (rem)
+  const bubblePulseAnimation = {
+    initial: { scale: 1 },
+    animate: {
+      scale: [1, 1.1, 1], // Gentle pulse
+      transition: {
+        duration: 3,
+        repeat: Infinity,
+        repeatType: "mirror",
+        ease: "easeInOut",
+      },
+    },
+  };
+
+  const revealBounceAnimation = {
+    initial: { opacity: 0, y: 20 },
+    animate: {
+      opacity: 2,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut",
+        repeat: Infinity,
+        repeatType: "mirror",
+        y: {
+          duration: 1,
+          repeat: Infinity,
+          repeatType: "mirror",
+          ease: "easeInOut",
+        },
+      },
+    },
+  };
+
+  const mediaRotateScaleAnimation = {
+    initial: { scale: 1, rotate: 0 },
+    animate: {
+      scale: [1, 1.05, 1], // Subtle scaling
+      rotate: [0, 3, -3, 0], // Gentle rotation
+      transition: {
+        duration: 6,
+        repeat: Infinity,
+        repeatType: "mirror",
+        ease: "easeInOut",
+      },
+    },
+  };
+
+  const infographicPopAnimation = {
+    initial: { scale: 0.8, opacity: 0.8 },
+    animate: {
+      scale: [0.9, 1, 0.9], // Pop effect
+      opacity: [0.9, 1, 0.9], // Fade in and out
+      transition: {
+        duration: 2,
+        repeat: Infinity,
+        repeatType: "mirror",
+        ease: "easeInOut",
+      },
+    },
+  };
 
   return (
     <Box
@@ -90,7 +148,7 @@ export default function BigScreenPage() {
         display: "flex",
         flexDirection: "row",
         width: "100vw",
-        height: "100vh",
+        height: "85vh",
         userSelect: "none",
       }}
     >
@@ -109,25 +167,16 @@ export default function BigScreenPage() {
         <ArrowBackIcon />
       </IconButton>
 
-      {/* 📌 LEFT: Year Bubbles (70%) */}
+      {/* 📌 LEFT: Timeline Container (70%) */}
       <Box sx={{ width: "70%", height: "100%", position: "relative" }}>
+        {/* Timeline Years */}
         {timelineRecords.map((year, index) => {
           const isActive = selectedEvent?.year === year.year;
-          const yPosition = year.yPosition;
-
-          // Position logic
-          const placeBelow = yPosition <= 20;
-          const placeAbove = yPosition >= 80;
-          const distributeEvenly = !placeBelow && !placeAbove;
-
-          // We'll track how far we've stacked above & below
-          let offsetAbove = MAIN_BUBBLE_RADIUS; // start just beyond the main bubble
-          let offsetBelow = MAIN_BUBBLE_RADIUS;
 
           return (
-            <Box
-              key={year.year}
-              sx={{
+            <motion.div
+              key={year._id}
+              style={{
                 position: "absolute",
                 left: `${year.xPosition}%`,
                 top: `${year.yPosition}%`,
@@ -137,247 +186,210 @@ export default function BigScreenPage() {
               {/* Year Bubble */}
               <motion.div
                 ref={(el) => (yearRefs.current[index] = el)}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
+                initial={bubblePulseAnimation.initial}
+                animate={bubblePulseAnimation.animate}
                 style={{
+                  ...bubbleStyle,
                   background: isActive
                     ? "linear-gradient(90deg, #0088ff, #00ffcc)"
                     : "radial-gradient(circle, #009688, #00796b)",
                   color: isActive ? "#222" : "#fff",
                   borderRadius: isActive ? "10px" : "50%",
-
-                  color: isActive ? "#222" : "#fff",
-                  borderRadius: isActive ? "10px" : "50%",
-                  color: isActive ? "#000" : "#fff",
                   minWidth: isActive ? "8rem" : "5rem",
                   height: isActive ? "4rem" : "5rem",
                   padding: isActive ? "1rem 1.5rem" : "1rem",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  zIndex: 10,
                 }}
               >
                 {year.year}
               </motion.div>
+            </motion.div>
+          );
+        })}
 
-              {/* If active, show the info bubbles */}
-              {isActive && (
-                <>
-                  {/* DESCRIPTION BUBBLES */}
-                  {selectedEvent.description?.length > 0 &&
-                    selectedEvent.description.some(
-                      (desc) => desc.trim() !== ""
-                    ) &&
-                    (() => {
-                      // Filter valid descriptions
-                      const validDescriptions =
-                        selectedEvent.description.filter(
-                          (desc) => desc.trim() !== ""
-                        );
+        {/* Title and Description (Separate Block) */}
+        {selectedEvent?.entries?.map((entry) => {
+          // Skip if xPosition or yPosition is null
+          if (entry.xPosition === null || entry.yPosition === null) return null;
 
-                      // Don't render if there are no valid descriptions
-                      if (validDescriptions.length === 0) return null;
+          return (
+            <Box
+              key={`title-desc-${entry._id}`}
+              sx={{
+                position: "absolute",
+                left: `${entry.xPosition}%`,
+                top: `${entry.yPosition}%`,
+                transform: "translate(-50%, -50%)",
+                zIndex: 20,
+              }}
+            >
+              {/* Title and Description */}
+              {entry.title && (
+                <motion.div
+                  initial={revealBounceAnimation.initial}
+                  animate={revealBounceAnimation.animate}
+                  style={{
+                    ...bubbleStyle,
+                    background: "linear-gradient(90deg, #526172, #0093B4)",
+                    color: "#fff",
+                    borderRadius: "10px",
+                    padding: "1rem",
+                    minWidth: "20rem",
+                    minHeight: "5rem",
+                    overflow: "hidden",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "start",
+                    textAlign: "left",
+                    whiteSpace: "normal",
+                    flexGrow: 1,
+                  }}
+                >
+                  <Typography variant="h6" sx={{ marginBottom: "0.5rem" }}>
+                    {entry.title}
+                  </Typography>
+                  {entry.description?.length > 0 && (
+                    <Box>
+                      {entry.description.length === 1 ? (
+                        <Typography variant="body1">
+                          {entry.description[0]}
+                        </Typography>
+                      ) : (
+                        <ul style={{ paddingLeft: "1rem", margin: 0 }}>
+                          {entry.description.map((desc, i) => (
+                            <li key={i}>
+                              <Typography variant="body1">{desc}</Typography>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </Box>
+                  )}
+                </motion.div>
+              )}
+            </Box>
+          );
+        })}
 
-                      // Decide above/below
-                      let yDir = 1; // +1 => below, -1 => above
-                      if (placeAbove) {
-                        yDir = -1;
-                      } else if (placeBelow) {
-                        yDir = 1;
-                      } else {
-                        // distributeEvenly => choose the side with more space
-                        yDir = offsetBelow <= offsetAbove ? 1 : -1;
-                      }
+        {/* Media (Separate Block) */}
+        {selectedEvent?.entries?.map((entry) => {
+          // Skip if xPosition or yPosition is null
+          if (entry.xPosition === null || entry.yPosition === null) return null;
 
-                      // Positioning offset
-                      let finalOffset = 0;
-                      if (yDir === -1) {
-                        // Going above
-                        finalOffset = -(
-                          offsetAbove +
-                          DESC_BUBBLE_RADIUS +
-                          SPACING
-                        );
-                        offsetAbove += DESC_BUBBLE_RADIUS * 2 + SPACING;
-                      } else {
-                        // Going below
-                        finalOffset =
-                          offsetBelow + DESC_BUBBLE_RADIUS + SPACING;
-                        offsetBelow += DESC_BUBBLE_RADIUS * 2 + SPACING;
-                      }
+          return (
+            <React.Fragment key={`media-${entry._id}`}>
+              {entry.media?.map((media, i) => {
+                // Skip if xPosition or yPosition is null
+                if (media.xPosition === null || media.yPosition === null)
+                  return null;
 
-                      return (
-                        <motion.div
-                          initial={{ scale: 0.5, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          transition={{ duration: 0.5 }}
-                          style={{
-                            position: "absolute",
-                            left: "50%",
-                            top: `calc(50% + ${finalOffset}rem)`,
-                            transform: "translate(-50%, -50%)",
-                            background:
-                              "linear-gradient(90deg, #0088ff, #00ffcc)",
-                            color: "#000",
-                            padding: "1rem",
-                            borderRadius: "50%",
-                            textAlign: "center",
-                            width: "14rem",
-                            minHeight: "12rem",
-                            maxHeight: "16rem", // Prevents overflow
-                            boxShadow: "0 0 10px rgba(0, 255, 255, 0.8)",
-                            fontSize: "1.2rem",
-                            zIndex: 20,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            flexDirection: "column",
-                            overflow: "hidden", // Prevents text from spilling out
-                            wordWrap: "break-word",
-                            paddingTop: "1.5rem",
-                          }}
-                        >
-                          <ul
-                            style={{
-                              margin: 0,
-                              padding: "0 1rem",
-                              textAlign: "left",
-                              listStyle: "decimal",
-                              maxWidth: "100%",
-                              overflowWrap: "break-word", // Ensures text breaks properly
-                              wordBreak: "break-word",
-                              overflowY: "auto", // Enables scrolling for long text
-                              maxHeight: "14rem",
-                            }}
-                          >
-                            {validDescriptions.map((desc, i) => (
-                              <li
-                                key={i}
-                                style={{
-                                  marginBottom: "0.5rem",
-                                  fontSize: "1rem",
-                                }}
-                              >
-                                {desc}
-                              </li>
-                            ))}
-                          </ul>
-                        </motion.div>
-                      );
-                    })()}
-
-                  {/* MEDIA BUBBLE */}
-                  {selectedEvent.media?.url && (
+                return (
+                  <Box
+                    key={i}
+                    sx={{
+                      position: "absolute",
+                      left: `${media.xPosition}%`,
+                      top: `${media.yPosition}%`,
+                      transform: "translate(-50%, -50%)",
+                      zIndex: 20,
+                    }}
+                  >
                     <motion.div
-                      initial={{ scale: 0.5, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.5 }}
+                      initial={mediaRotateScaleAnimation.initial}
+                      animate={mediaRotateScaleAnimation.animate}
                       style={{
-                        position: "absolute",
-                        left: "50%",
-                        // Let's place media below if top or distribute, above if bottom
-                        top: (() => {
-                          // We'll put it below unless placeAbove is set
-                          if (placeAbove) {
-                            const yVal = -(
-                              offsetAbove +
-                              MEDIA_BUBBLE_RADIUS +
-                              SPACING
-                            );
-                            offsetAbove += MEDIA_BUBBLE_RADIUS * 2 + SPACING;
-                            return `calc(50% + ${yVal}rem)`;
-                          } else {
-                            const yVal =
-                              offsetBelow + MEDIA_BUBBLE_RADIUS + SPACING;
-                            offsetBelow += MEDIA_BUBBLE_RADIUS * 2 + SPACING;
-                            return `calc(50% + ${yVal}rem)`;
-                          }
-                        })(),
-                        transform: "translate(-50%, -50%)",
                         background: "transparent",
-                        borderRadius: "50%",
+                        borderRadius:
+                          media.mediaType === "image" ? "50%" : "10px",
                         boxShadow: "0 0 10px rgba(0, 255, 255, 0.8)",
-                        zIndex: 2100,
+                        overflow: "hidden",
                       }}
                     >
-                      {selectedEvent.media.type === "image" ? (
+                      {media.mediaType === "image" ? (
                         <img
-                          src={selectedEvent.media.url}
+                          src={media.url}
                           alt="Media"
                           style={{
                             width: "200px",
                             height: "200px",
                             objectFit: "cover",
-                            borderRadius: "50%",
                           }}
                         />
                       ) : (
                         <video
-                          src={selectedEvent.media.url}
-                          controls
+                          src={media.url}
+                          autoPlay
+                          muted
+                          loop
+                          controls={false}
                           style={{
-                            width: "200px",
+                            width: "300px",
                             height: "200px",
                             objectFit: "cover",
-                            borderRadius: "50%",
+                            borderRadius: "10px",
                           }}
                         />
                       )}
                     </motion.div>
-                  )}
+                  </Box>
+                );
+              })}
+            </React.Fragment>
+          );
+        })}
 
-                  {/* INFOGRAPHIC BUBBLE */}
-                  {selectedEvent.infographic?.url && (
+        {/* Infographics (Separate Block) */}
+        {selectedEvent?.entries?.map((entry) => {
+          // Skip if xPosition or yPosition is null
+          if (entry.xPosition === null || entry.yPosition === null) return null;
+
+          return (
+            <React.Fragment key={`infographics-${entry._id}`}>
+              {entry.infographics?.map((infographic, i) => {
+                // Skip if xPosition or yPosition is null
+                if (
+                  infographic.xPosition === null ||
+                  infographic.yPosition === null
+                )
+                  return null;
+
+                return (
+                  <Box
+                    key={i}
+                    sx={{
+                      position: "absolute",
+                      left: `${infographic.xPosition}%`,
+                      top: `${infographic.yPosition}%`,
+                      transform: "translate(-50%, -50%)",
+                      zIndex: 20,
+                    }}
+                  >
                     <motion.div
-                      initial={{ scale: 0.5, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.5 }}
+                      initial={infographicPopAnimation.initial}
+                      animate={infographicPopAnimation.animate}
                       style={{
-                        position: "absolute",
-                        left: "50%",
-                        // We'll place it below if top or distribute, above if bottom
-                        top: (() => {
-                          if (placeAbove) {
-                            const yVal = -(
-                              offsetAbove +
-                              INFOGRAPHIC_BUBBLE_RADIUS +
-                              SPACING
-                            );
-                            offsetAbove +=
-                              INFOGRAPHIC_BUBBLE_RADIUS * 2 + SPACING;
-                            return `calc(50% + ${yVal}rem)`;
-                          } else {
-                            const yVal =
-                              offsetBelow + INFOGRAPHIC_BUBBLE_RADIUS + SPACING;
-                            offsetBelow +=
-                              INFOGRAPHIC_BUBBLE_RADIUS * 2 + SPACING;
-                            return `calc(50% + ${yVal}rem)`;
-                          }
-                        })(),
-                        transform: "translate(-50%, -50%)",
                         background: "transparent",
-                        borderRadius: "50%",
+                        borderRadius: "10px",
                         boxShadow: "0 0 10px rgba(0, 255, 255, 0.8)",
+                        overflow: "hidden",
                       }}
                     >
                       <img
-                        src={selectedEvent.infographic.url}
+                        src={infographic.url}
                         alt="Infographic"
                         style={{
-                          width: "120px",
-                          height: "120px",
+                          width: "200px",
+                          height: "150px",
                           objectFit: "cover",
-                          borderRadius: "50%",
                         }}
                       />
                     </motion.div>
-                  )}
-                </>
-              )}
-            </Box>
+                  </Box>
+                );
+              })}
+            </React.Fragment>
           );
         })}
+
         {/* Lines Connecting Year Bubbles */}
         {yearLineStyles.map((style, idx) => (
           <motion.div
@@ -400,25 +412,16 @@ export default function BigScreenPage() {
         ))}
       </Box>
 
-      {/* 📌 RIGHT: Program Bubbles (30%) */}
+      {/* 📌 RIGHT: Program Container (30%) */}
       <Box sx={{ width: "30%", height: "100%", position: "relative" }}>
+        {/* Program Titles */}
         {programRecords.map((program, index) => {
           const isActive = selectedProgram?.title === program.title;
-          const yPosition = program.yPosition;
-
-          // Position logic
-          const placeBelow = yPosition <= 20;
-          const placeAbove = yPosition >= 80;
-          const distributeEvenly = !placeBelow && !placeAbove;
-
-          // We'll track how far we've stacked above & below
-          let offsetAbove = MAIN_BUBBLE_RADIUS; // start just beyond the main bubble
-          let offsetBelow = MAIN_BUBBLE_RADIUS;
 
           return (
-            <Box
-              key={`program-${index}`}
-              sx={{
+            <motion.div
+              key={program._id}
+              style={{
                 position: "absolute",
                 left: `${program.xPosition}%`,
                 top: `${program.yPosition}%`,
@@ -427,246 +430,207 @@ export default function BigScreenPage() {
             >
               {/* Program Bubble */}
               <motion.div
-                ref={(el) => (programRefs.current[index] = el)}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
+                initial={bubblePulseAnimation.initial}
+                animate={bubblePulseAnimation.animate}
                 style={{
+                  ...bubbleStyle,
                   background: isActive
                     ? "linear-gradient(90deg, #0088ff, #00ffcc)"
                     : "radial-gradient(circle, #009688, #00796b)",
                   color: isActive ? "#222" : "#fff",
                   borderRadius: isActive ? "10px" : "50%",
-
-                  color: isActive ? "#222" : "#fff",
-                  borderRadius: isActive ? "10px" : "50%",
-                  color: isActive ? "#000" : "#fff",
                   minWidth: isActive ? "8rem" : "5rem",
                   height: isActive ? "4rem" : "5rem",
                   padding: isActive ? "1rem 1.5rem" : "1rem",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  zIndex: 10,
                 }}
               >
                 {program.title}
               </motion.div>
+            </motion.div>
+          );
+        })}
 
-              {/* If active, show the info bubbles */}
-              {isActive && (
-                <>
-                  {/* DESCRIPTION BUBBLES */}
-                  {selectedProgram.description?.length > 0 &&
-                    selectedProgram.description.some(
-                      (desc) => desc.trim() !== ""
-                    ) &&
-                    (() => {
-                      // Filter valid descriptions
-                      const validDescriptions =
-                        selectedProgram.description.filter(
-                          (desc) => desc.trim() !== ""
-                        );
+        {/* Title and Description (Separate Block) */}
+        {selectedProgram?.entries?.map((entry) => {
+          // Skip if xPosition or yPosition is null
+          if (entry.xPosition === null || entry.yPosition === null) return null;
 
-                      // Don't render if there are no valid descriptions
-                      if (validDescriptions.length === 0) return null;
+          return (
+            <Box
+              key={`title-desc-${entry._id}`}
+              sx={{
+                position: "absolute",
+                left: `${entry.xPosition}%`,
+                top: `${entry.yPosition}%`,
+                transform: "translate(-50%, -50%)",
+                zIndex: 20,
+              }}
+            >
+              {/* Title and Description */}
+              {entry.title && (
+                <motion.div
+                  initial={revealBounceAnimation.initial}
+                  animate={revealBounceAnimation.animate}
+                  style={{
+                    ...bubbleStyle,
+                    background: "linear-gradient(90deg, #526172, #0093B4)",
+                    color: "#fff",
+                    borderRadius: "10px",
+                    padding: "1rem",
+                    minWidth: "20rem",
+                    minHeight: "5rem",
+                    overflow: "hidden",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "start",
+                    textAlign: "left",
+                    whiteSpace: "normal",
+                    flexGrow: 1,
+                  }}
+                >
+                  <Typography variant="h6" sx={{ marginBottom: "0.5rem" }}>
+                    {entry.title}
+                  </Typography>
+                  {entry.description?.length > 0 && (
+                    <Box>
+                      {entry.description.length === 1 ? (
+                        <Typography variant="body1">
+                          {entry.description[0]}
+                        </Typography>
+                      ) : (
+                        <ul style={{ paddingLeft: "1rem", margin: 0 }}>
+                          {entry.description.map((desc, i) => (
+                            <li key={i}>
+                              <Typography variant="body1">{desc}</Typography>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </Box>
+                  )}
+                </motion.div>
+              )}
+            </Box>
+          );
+        })}
 
-                      // Decide above/below
-                      let yDir = 1; // +1 => below, -1 => above
-                      if (placeAbove) {
-                        yDir = -1;
-                      } else if (placeBelow) {
-                        yDir = 1;
-                      } else {
-                        // distributeEvenly => choose the side with more space
-                        yDir = offsetBelow <= offsetAbove ? 1 : -1;
-                      }
+        {/* Media (Separate Block) */}
+        {selectedProgram?.entries?.map((entry) => {
+          // Skip if xPosition or yPosition is null
+          if (entry.xPosition === null || entry.yPosition === null) return null;
 
-                      // Positioning offset
-                      let finalOffset = 0;
-                      if (yDir === -1) {
-                        // Going above
-                        finalOffset = -(
-                          offsetAbove +
-                          DESC_BUBBLE_RADIUS +
-                          SPACING
-                        );
-                        offsetAbove += DESC_BUBBLE_RADIUS * 2 + SPACING;
-                      } else {
-                        // Going below
-                        finalOffset =
-                          offsetBelow + DESC_BUBBLE_RADIUS + SPACING;
-                        offsetBelow += DESC_BUBBLE_RADIUS * 2 + SPACING;
-                      }
+          return (
+            <React.Fragment key={`media-${entry._id}`}>
+              {entry.media?.map((media, i) => {
+                // Skip if xPosition or yPosition is null
+                if (media.xPosition === null || media.yPosition === null)
+                  return null;
 
-                      return (
-                        <motion.div
-                          initial={{ scale: 0.5, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          transition={{ duration: 0.5 }}
-                          style={{
-                            position: "absolute",
-                            left: "50%",
-                            top: `calc(50% + ${finalOffset}rem)`,
-                            transform: "translate(-50%, -50%)",
-                            background:
-                              "linear-gradient(90deg, #0088ff, #00ffcc)",
-                            color: "#000",
-                            padding: "1rem",
-                            borderRadius: "50%",
-                            textAlign: "center",
-                            width: "14rem",
-                            minHeight: "12rem",
-                            maxHeight: "16rem", // Prevents overflow
-                            boxShadow: "0 0 10px rgba(0, 255, 255, 0.8)",
-                            fontSize: "1.2rem",
-                            zIndex: 20,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            flexDirection: "column",
-                            overflow: "hidden", // Prevents text from spilling out
-                            wordWrap: "break-word",
-                            paddingTop: "1.5rem",
-                          }}
-                        >
-                          <ul
-                            style={{
-                              margin: 0,
-                              padding: "0 1rem",
-                              textAlign: "left",
-                              listStyle: "decimal",
-                              maxWidth: "100%",
-                              overflowWrap: "break-word", // Ensures text breaks properly
-                              wordBreak: "break-word",
-                              overflowY: "auto", // Enables scrolling for long text
-                              maxHeight: "14rem",
-                            }}
-                          >
-                            {validDescriptions.map((desc, i) => (
-                              <li
-                                key={i}
-                                style={{
-                                  marginBottom: "0.5rem",
-                                  fontSize: "1rem",
-                                }}
-                              >
-                                {desc}
-                              </li>
-                            ))}
-                          </ul>
-                        </motion.div>
-                      );
-                    })()}
-
-                  {/* MEDIA BUBBLE */}
-                  {selectedProgram.media?.url && (
+                return (
+                  <Box
+                    key={i}
+                    sx={{
+                      position: "absolute",
+                      left: `${media.xPosition}%`,
+                      top: `${media.yPosition}%`,
+                      transform: "translate(-50%, -50%)",
+                      zIndex: 20,
+                    }}
+                  >
                     <motion.div
-                      initial={{ scale: 0.5, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.5 }}
+                      initial={mediaRotateScaleAnimation.initial}
+                      animate={mediaRotateScaleAnimation.animate}
                       style={{
-                        position: "absolute",
-                        left: "50%",
-                        // Let's place media below if top or distribute, above if bottom
-                        top: (() => {
-                          // We'll put it below unless placeAbove is set
-                          if (placeAbove) {
-                            const yVal = -(
-                              offsetAbove +
-                              MEDIA_BUBBLE_RADIUS +
-                              SPACING
-                            );
-                            offsetAbove += MEDIA_BUBBLE_RADIUS * 2 + SPACING;
-                            return `calc(50% + ${yVal}rem)`;
-                          } else {
-                            const yVal =
-                              offsetBelow + MEDIA_BUBBLE_RADIUS + SPACING;
-                            offsetBelow += MEDIA_BUBBLE_RADIUS * 2 + SPACING;
-                            return `calc(50% + ${yVal}rem)`;
-                          }
-                        })(),
-                        transform: "translate(-50%, -50%)",
                         background: "transparent",
-                        borderRadius: "50%",
+                        borderRadius:
+                          media.mediaType === "image" ? "50%" : "10px",
                         boxShadow: "0 0 10px rgba(0, 255, 255, 0.8)",
-                        zIndex: 2100,
+                        overflow: "hidden",
                       }}
                     >
-                      {selectedProgram.media.type === "image" ? (
+                      {media.mediaType === "image" ? (
                         <img
-                          src={selectedProgram.media.url}
+                          src={media.url}
                           alt="Media"
                           style={{
                             width: "200px",
                             height: "200px",
                             objectFit: "cover",
-                            borderRadius: "50%",
                           }}
                         />
                       ) : (
                         <video
-                          src={selectedProgram.media.url}
-                          controls
+                          src={media.url}
+                          autoPlay
+                          muted
+                          loop
+                          controls={false}
                           style={{
-                            width: "200px",
+                            width: "300px",
                             height: "200px",
                             objectFit: "cover",
-                            borderRadius: "50%",
+                            borderRadius: "10px",
                           }}
                         />
                       )}
                     </motion.div>
-                  )}
+                  </Box>
+                );
+              })}
+            </React.Fragment>
+          );
+        })}
 
-                  {/* INFOGRAPHIC BUBBLE */}
-                  {selectedProgram.infographic?.url && (
+        {/* Infographics (Separate Block) */}
+        {selectedProgram?.entries?.map((entry) => {
+          // Skip if xPosition or yPosition is null
+          if (entry.xPosition === null || entry.yPosition === null) return null;
+
+          return (
+            <React.Fragment key={`infographics-${entry._id}`}>
+              {entry.infographics?.map((infographic, i) => {
+                // Skip if xPosition or yPosition is null
+                if (
+                  infographic.xPosition === null ||
+                  infographic.yPosition === null
+                )
+                  return null;
+
+                return (
+                  <Box
+                    key={i}
+                    sx={{
+                      position: "absolute",
+                      left: `${infographic.xPosition}%`,
+                      top: `${infographic.yPosition}%`,
+                      transform: "translate(-50%, -50%)",
+                      zIndex: 20,
+                    }}
+                  >
                     <motion.div
-                      initial={{ scale: 0.5, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.5 }}
+                      initial={infographicPopAnimation.initial}
+                      animate={infographicPopAnimation.animate}
                       style={{
-                        position: "absolute",
-                        left: "50%",
-                        // We'll place it below if top or distribute, above if bottom
-                        top: (() => {
-                          if (placeAbove) {
-                            const yVal = -(
-                              offsetAbove +
-                              INFOGRAPHIC_BUBBLE_RADIUS +
-                              SPACING
-                            );
-                            offsetAbove +=
-                              INFOGRAPHIC_BUBBLE_RADIUS * 2 + SPACING;
-                            return `calc(50% + ${yVal}rem)`;
-                          } else {
-                            const yVal =
-                              offsetBelow + INFOGRAPHIC_BUBBLE_RADIUS + SPACING;
-                            offsetBelow +=
-                              INFOGRAPHIC_BUBBLE_RADIUS * 2 + SPACING;
-                            return `calc(50% + ${yVal}rem)`;
-                          }
-                        })(),
-                        transform: "translate(-50%, -50%)",
                         background: "transparent",
-                        borderRadius: "50%",
+                        borderRadius: "10px",
                         boxShadow: "0 0 10px rgba(0, 255, 255, 0.8)",
+                        overflow: "hidden",
                       }}
                     >
                       <img
-                        src={selectedProgram.infographic.url}
+                        src={infographic.url}
                         alt="Infographic"
                         style={{
-                          width: "120px",
-                          height: "120px",
+                          width: "200px",
+                          height: "150px",
                           objectFit: "cover",
-                          borderRadius: "50%",
                         }}
                       />
                     </motion.div>
-                  )}
-                </>
-              )}
-            </Box>
+                  </Box>
+                );
+              })}
+            </React.Fragment>
           );
         })}
       </Box>
