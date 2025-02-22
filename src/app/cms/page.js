@@ -60,24 +60,44 @@ const getItemSchema = (isProgram) => {
   });
 };
 
-// Validation schema for entry form
-// ✅ Updated validation schema
-const entrySchema = yup.object().shape({
-  title: yup.string().required("Title is required"),
-  description: yup
-    .string()
-    .required("Description is required")
-    .test(
-      "non-empty-lines",
-      "Description must have at least one non-empty line",
-      (value) => {
-        // Split into lines and check if any line is non-empty
-        return value.split("\n").some((line) => line.trim().length > 0);
-      }
-    ),
-  xPosition: yup.number().required("X Position is required"),
-  yPosition: yup.number().required("Y Position is required"),
-});
+// Updated validation schema for entries (Handles optional fields for programs)
+const entrySchema = (isProgram) => {
+  return yup.object().shape({
+    title: isProgram
+      ? yup.string().nullable().default(undefined) // ✅ Optional
+      : yup.string().required("Title is required"),
+
+    description: isProgram
+      ? yup.string().nullable().default(undefined) // ✅ Optional
+      : yup
+          .string()
+          .required("Description is required")
+          .test(
+            "non-empty-lines",
+            "Description must have at least one non-empty line",
+            (value) =>
+              value?.split("\n").some((line) => line.trim().length > 0)
+          ),
+
+    xPosition: isProgram
+      ? yup
+          .number()
+          .nullable()
+          .transform((value, originalValue) =>
+            originalValue === "" ? undefined : value
+          ) // ✅ Fix NaN error
+      : yup.number().required("X Position is required"),
+
+    yPosition: isProgram
+      ? yup
+          .number()
+          .nullable()
+          .transform((value, originalValue) =>
+            originalValue === "" ? undefined : value
+          ) // ✅ Fix NaN error
+      : yup.number().required("Y Position is required"),
+  });
+};
 
 export default function CMSPage() {
   const router = useRouter();
@@ -107,15 +127,15 @@ export default function CMSPage() {
   const [entryForm, setEntryForm] = useState({
     title: "",
     description: "",
-    xPosition: "",
-    yPosition: "",
+    xPosition: null, 
+    yPosition: null, 
     media: [],
     mediaXPositions: [],
     mediaYPositions: [],
     infographics: [],
     infographicXPositions: [],
     infographicYPositions: [],
-  });
+  });  
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -378,89 +398,96 @@ export default function CMSPage() {
 
   // Handle entry form submission
   const handleEntrySubmit = async () => {
-  try {
-    setEntryErrors({}); // Clear previous errors
-
-    // ✅ Validate locally before making the request
-    await entrySchema.validate(entryForm, { abortEarly: false });
-
-    const formData = new FormData();
-    formData.append("title", entryForm.title);
-
-    // ✅ Handle description formatting
-    const formattedDescription = entryForm.description
-      .split("\n")
-      .map((line) => line.trim())
-      .filter((line) => line.length > 0);
-    formData.append("description", JSON.stringify(formattedDescription));
-    formData.append("xPosition", entryForm.xPosition);
-    formData.append("yPosition", entryForm.yPosition);
-
-    // ✅ Append media files and positions properly
-    entryForm.media.forEach((file, index) => {
-      formData.append("media", file);
-      formData.append("mediaXPositions[]", entryForm.mediaXPositions[index]);
-      formData.append("mediaYPositions[]", entryForm.mediaYPositions[index]);
-    });
-
-    // ✅ Append infographics and positions properly
-    entryForm.infographics.forEach((file, index) => {
-      formData.append("infographic", file);
-      formData.append(
-        "infographicXPositions[]",
-        entryForm.infographicXPositions[index]
-      );
-      formData.append(
-        "infographicYPositions[]",
-        entryForm.infographicYPositions[index]
-      );
-    });
-
-    let response;
-    if (editingEntry) {
-      response =
-        activeTab === 0
-          ? await updateEntryInTimeline(selectedParentId, editingEntry._id, formData)
-          : await updateEntryInProgram(selectedParentId, editingEntry._id, formData);
+    try {
+      setEntryErrors({}); // Clear previous errors
+      const schema = entrySchema(activeTab === 1); // ✅ Check if it's a program
+  
+      // ✅ Validate locally before making the request
+      await schema.validate(entryForm, { abortEarly: false });
+  
+      const formData = new FormData();
+      formData.append("title", entryForm.title || ""); // ✅ Default empty if optional
+  
+      // ✅ Handle description formatting (convert empty string to empty array)
+      let formattedDescription = [];
+      if (entryForm.description?.trim()) {
+        formattedDescription = entryForm.description
+          .split("\n")
+          .map((line) => line.trim())
+          .filter((line) => line.length > 0);
+      }
+      // ✅ Send JSON string, ensuring it's either a valid array or omitted
+    if (formattedDescription.length > 0) {
+      formData.append("description", JSON.stringify(formattedDescription));
     } else {
-      response =
-        activeTab === 0
-          ? await addEntryToTimeline(selectedParentId, formData)
-          : await addEntryToProgram(selectedParentId, formData);
+      formData.append("description", null); // ✅ Send empty array
     }
+  
+      // ✅ Convert missing x/y positions to `null`
+      formData.append("xPosition", entryForm.xPosition ?? null); // ✅ Default to `null`
+      formData.append("yPosition", entryForm.yPosition ?? null); // ✅ Default to `null`
 
-    setSnackbar({
-      open: true,
-      message: response.message || "Entry saved successfully",
-      severity: response.success ? "success" : "error",
-    });
-
-    setOpenEntryDialog(false);
-
-    // ✅ Fetch latest data immediately
-    const [updatedTimelines, updatedPrograms] = await Promise.all([
-      getTimelines(),
-      getPrograms(),
-    ]);
-    setTimelines(updatedTimelines?.data || []);
-    setPrograms(updatedPrograms?.data || []);
-  } catch (error) {
-    if (error.inner) {
-      // ✅ Show field-specific validation errors
-      const newErrors = {};
-      error.inner.forEach((err) => {
-        newErrors[err.path] = err.message;
+  
+      // ✅ Append media files and positions properly
+      entryForm.media.forEach((file, index) => {
+        formData.append("media", file);
+        formData.append("mediaXPositions[]", entryForm.mediaXPositions[index]);
+        formData.append("mediaYPositions[]", entryForm.mediaYPositions[index]);
       });
-      setEntryErrors(newErrors);
-    } else {
+  
+      // ✅ Append infographics and positions properly
+      entryForm.infographics.forEach((file, index) => {
+        formData.append("infographic", file);
+        formData.append("infographicXPositions[]", entryForm.infographicXPositions[index]);
+        formData.append("infographicYPositions[]", entryForm.infographicYPositions[index]);
+      });
+  
+      let response;
+      if (editingEntry) {
+        response =
+          activeTab === 0
+            ? await updateEntryInTimeline(selectedParentId, editingEntry._id, formData)
+            : await updateEntryInProgram(selectedParentId, editingEntry._id, formData);
+      } else {
+        response =
+          activeTab === 0
+            ? await addEntryToTimeline(selectedParentId, formData)
+            : await addEntryToProgram(selectedParentId, formData);
+      }
+  
       setSnackbar({
         open: true,
-        message: error?.response?.data?.message || "Failed to save entry",
-        severity: "error",
+        message: response.message || "Entry saved successfully",
+        severity: response.success ? "success" : "error",
       });
+  
+      setOpenEntryDialog(false);
+  
+      // ✅ Fetch latest data immediately
+      const [updatedTimelines, updatedPrograms] = await Promise.all([
+        getTimelines(),
+        getPrograms(),
+      ]);
+      setTimelines(updatedTimelines?.data || []);
+      setPrograms(updatedPrograms?.data || []);
+    } catch (error) {
+      if (error.inner) {
+        // ✅ Show field-specific validation errors
+        const newErrors = {};
+        error.inner.forEach((err) => {
+          newErrors[err.path] = err.message;
+        });
+        setEntryErrors(newErrors);
+      } else {
+        setSnackbar({
+          open: true,
+          message: error?.response?.data?.message || "Failed to save entry",
+          severity: "error",
+        });
+      }
     }
-  }
-};
+  };
+  
   return (
     <Box sx={{ p: 4, maxWidth: "90vw" }}>
       <Typography variant="h4" fontWeight="bold" mb={2}>
