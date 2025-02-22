@@ -100,6 +100,20 @@ export default function ControllerFour() {
     cursor: "pointer",
   };
 
+  const programBubbleStyle = {
+    ...roundBubble, // Inherits shared bubble styles
+    whiteSpace: "normal", // Allows text to wrap
+    wordWrap: "break-word", // Ensures long words break to fit
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    padding: "1rem", // Adds padding for better spacing
+    minWidth: "8rem", // Minimum width
+    maxWidth: "8rem", // Maximum width to prevent overflow
+    height: "8rem", // Height adjusts based on content
+  };
+
   // ✅ Selected Title Style (Rectangle)
   const selectedStyle = {
     background: "linear-gradient(90deg, #0088ff, #00ffcc)",
@@ -195,7 +209,7 @@ export default function ControllerFour() {
 
         {/* ✅ Display Titles as Selectable Bubbles */}
         {programTitles.map((title, index) => {
-          const translateY = index % 2 === 1 ? "-6rem" : "6rem";
+          const translateY = index % 2 === 1 ? "-3rem" : "3rem";
 
           return (
             <Box
@@ -220,7 +234,7 @@ export default function ControllerFour() {
                 whileTap={{ scale: 0.85, transition: { duration: 0.1 } }}
                 transition={{ duration: 0.5 }}
                 style={{
-                  ...roundBubble,
+                  ...programBubbleStyle,
                   ...(selectedTitle === title ? selectedStyle : {}), // ✅ Transform into rectangle when selected
                 }}
                 onClick={() => {

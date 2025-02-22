@@ -81,6 +81,21 @@ export default function BigScreenPage() {
     transition: "all 0.3s ease-in-out",
   };
 
+  // Program Bubbles with Text Wrapping
+const programBubbleStyle = {
+  ...bubbleStyle, // Inherits shared bubble styles
+  whiteSpace: "normal", // Allows text to wrap
+  wordWrap: "break-word", // Ensures long words break to fit
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  textAlign: "center",
+  padding: "1rem", // Adds padding for better spacing
+  minWidth: "8rem", // Minimum width
+  maxWidth: "8rem", // Maximum width to prevent overflow
+  height: "8rem", // Height adjusts based on content
+};
+
   const bubblePulseAnimation = {
     initial: { scale: 1 },
     animate: {
@@ -433,15 +448,12 @@ export default function BigScreenPage() {
                 initial={bubblePulseAnimation.initial}
                 animate={bubblePulseAnimation.animate}
                 style={{
-                  ...bubbleStyle,
+                  ...programBubbleStyle, // Use the updated style
                   background: isActive
                     ? "linear-gradient(90deg, #0088ff, #00ffcc)"
                     : "radial-gradient(circle, #009688, #00796b)",
                   color: isActive ? "#222" : "#fff",
                   borderRadius: isActive ? "10px" : "50%",
-                  minWidth: isActive ? "8rem" : "5rem",
-                  height: isActive ? "4rem" : "5rem",
-                  padding: isActive ? "1rem 1.5rem" : "1rem",
                 }}
               >
                 {program.title}
