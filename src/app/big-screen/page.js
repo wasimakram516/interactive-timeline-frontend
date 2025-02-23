@@ -287,7 +287,7 @@ export default function BigScreenPage() {
                   }}
                 >
                   <Typography
-                    variant="h2"
+                    variant="h3"
                     sx={{
                       marginBottom: "0.5rem",
                       background: "linear-gradient(45deg, #00FFFF, #00FFCC)",
@@ -538,7 +538,7 @@ export default function BigScreenPage() {
                 >
                   {/* Title */}
                   <Typography
-                    variant="h2"
+                    variant="h3"
                     sx={{
                       marginBottom: "0.5rem",
                       background: "linear-gradient(45deg, #00FFFF, #00FFCC)",
