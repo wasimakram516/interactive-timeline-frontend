@@ -118,6 +118,8 @@ export default function ControllerFour() {
   const selectedStyle = {
     background: "linear-gradient(90deg, #0088ff, #00ffcc)",
     boxShadow: "0px 0px 25px rgba(0, 255, 255, 1)",
+    whiteSpace: "normal", // Allows text to wrap
+    wordWrap: "break-word",
     color: "#000",
     fontSize: "1.4rem",
     width: "auto",
@@ -129,7 +131,6 @@ export default function ControllerFour() {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    whiteSpace: "nowrap",
   };
 
   return (
