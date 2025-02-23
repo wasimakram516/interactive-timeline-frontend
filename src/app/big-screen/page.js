@@ -233,8 +233,8 @@ export default function BigScreenPage() {
                     : "radial-gradient(circle, #009688, #00796b)",
                   color: isActive ? "#222" : "#fff",
                   borderRadius: isActive ? "10px" : "50%",
-                  minWidth: isActive ? "8rem" : "5rem",
-                  height: isActive ? "4rem" : "5rem",
+                  minWidth: isActive ? "8rem" : "7rem",
+                  height: isActive ? "4rem" : "7rem",
                   padding: isActive ? "1rem 1.5rem" : "1rem",
                 }}
               >

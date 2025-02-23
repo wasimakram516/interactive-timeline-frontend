@@ -85,8 +85,6 @@ export default function ControllerFour() {
     boxShadow: "0px 0px 20px rgba(0, 255, 204, 0.8)",
     color: "white",
     fontSize: "1.5rem",
-    width: "6rem",
-    height: "6rem",
     borderRadius: "50%",
     display: "flex",
     alignItems: "center",
@@ -109,9 +107,8 @@ export default function ControllerFour() {
     justifyContent: "center",
     textAlign: "center",
     padding: "1rem", // Adds padding for better spacing
-    minWidth: "8rem", // Minimum width
-    maxWidth: "8rem", // Maximum width to prevent overflow
-    height: "8rem", // Height adjusts based on content
+    minWidth: "10rem", // Minimum width
+    height: "10rem", // Height adjusts based on content
   };
 
   // ✅ Selected Title Style (Rectangle)
@@ -124,7 +121,7 @@ export default function ControllerFour() {
     fontSize: "1.4rem",
     width: "auto",
     minWidth: "10rem",
-    height: "4rem",
+    height: "10rem",
     padding: "1rem 1.5rem",
     borderRadius: "10px",
     textAlign: "center",
