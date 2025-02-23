@@ -28,7 +28,7 @@ function useWindowSize() {
 export default function ControllerThree() {
   const router = useRouter();
   const { sendYearSelection } = useWebSocketKiosk();
-  const timelineYears = [2021, 2022, 2023, 2024]; // ✅ Fixed Year Range
+  const timelineYears = [2022, 2023, 2024, 2025]; // ✅ Fixed Year Range
   const scrollContainerRef = useRef(null);
   const yearRefs = useRef([]);
   const [lineStyles, setLineStyles] = useState([]);
@@ -147,7 +147,7 @@ export default function ControllerThree() {
         🎮 Controller 3
       </Typography>
       <Typography variant="h6" color="lightgray" mb={4}>
-        Manage Timeline Years 2021 - 2024
+        Manage Timeline Years 2022 - 2025
       </Typography>
 
       <Box

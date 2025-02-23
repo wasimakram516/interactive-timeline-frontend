@@ -28,7 +28,7 @@ function useWindowSize() {
 export default function ControllerOne() {
   const router = useRouter();
   const { sendYearSelection } = useWebSocketKiosk();
-  const timelineYears = [2014, 2015, 2016]; // ✅ Fixed Year Range
+  const timelineYears = [2014, 2015, 2016, 2017]; // ✅ Fixed Year Range
   const scrollContainerRef = useRef(null);
   const yearRefs = useRef([]);
   const [lineStyles, setLineStyles] = useState([]);
@@ -147,7 +147,7 @@ export default function ControllerOne() {
         🎮 Controller 1
       </Typography>
       <Typography variant="h6" color="lightgray" mb={4}>
-        Manage Timeline Years 2014 - 2016
+        Manage Timeline Years 2014 - 2017
       </Typography>
 
       <Box
