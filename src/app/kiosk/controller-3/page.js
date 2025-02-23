@@ -157,7 +157,6 @@ export default function ControllerThree() {
           alignItems: "center",
           justifyContent: "center",
           position: "relative",
-          width: "80vw",
           maxWidth: "100vw",
           overflowX: "auto",
           overflowY: "hidden",
