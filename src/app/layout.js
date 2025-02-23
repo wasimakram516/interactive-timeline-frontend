@@ -1,4 +1,5 @@
 import "./globals.css";
+import ThemeRegistry from "@/app/styles/themeRegistry";
 
 export const metadata = {
   title: "Interactive Timeline",
@@ -9,7 +10,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        {children}
+      <ThemeRegistry>{children}</ThemeRegistry>
       </body>
     </html>
   );
