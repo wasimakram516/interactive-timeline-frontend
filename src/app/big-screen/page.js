@@ -358,7 +358,7 @@ export default function BigScreenPage() {
                           loop
                           controls={false}
                           style={{
-                            width: "300px",
+                            width: "auto",
                             height: "200px",
                             objectFit: "cover",
                             borderRadius: "10px",
@@ -596,7 +596,7 @@ export default function BigScreenPage() {
                           loop
                           controls={false}
                           style={{
-                            width: "300px",
+                            width: "auto",
                             height: "200px",
                             objectFit: "cover",
                             borderRadius: "10px",
