@@ -86,8 +86,8 @@ export default function ControllerThree() {
     boxShadow: "0px 0px 20px rgba(0, 255, 204, 0.8)",
     color: "white",
     fontSize: "1.5rem",
-    width: "6rem",
-    height: "6rem",
+    width: "10rem",
+    height: "10rem",
     borderRadius: "50%",
     display: "flex",
     alignItems: "center",
@@ -108,8 +108,8 @@ export default function ControllerThree() {
     boxShadow: "0px 0px 25px rgba(0, 255, 255, 1)",
     color: "#000",
     fontSize: "1.6rem",
-    width: "10rem",
-    height: "4rem",
+    width: "12rem",
+    height: "8rem",
     borderRadius: "10px",
   };
 
