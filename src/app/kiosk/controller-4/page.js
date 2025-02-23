@@ -129,6 +129,12 @@ export default function ControllerFour() {
     justifyContent: "center",
   };
 
+  const handleTitleClick = (title) => {
+    const newSelectedTitle = selectedTitle === title ? null : title; // Toggle selection
+    setSelectedTitle(newSelectedTitle); // Update local state
+    sendProgramSelection(newSelectedTitle); // Emit to WebSocket
+  };
+
   return (
     <Box
       sx={{
@@ -233,10 +239,7 @@ export default function ControllerFour() {
                   ...programBubbleStyle,
                   ...(selectedTitle === title ? selectedStyle : {}), // ✅ Transform into rectangle when selected
                 }}
-                onClick={() => {
-                  setSelectedTitle(title); // ✅ Store selected title
-                  sendProgramSelection(title);
-                }}
+                onClick={() => handleTitleClick(title)}
               >
                 {title}
               </motion.div>

@@ -172,7 +172,7 @@ export default function BigScreenPage() {
         width: "100vw",
         height: "85vh",
         userSelect: "none",
-        position:"relative"
+        position: "relative",
       }}
     >
       {/* Dark Overlay */}
@@ -184,8 +184,8 @@ export default function BigScreenPage() {
             left: 0,
             width: "100%",
             height: "100vh",
-            backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent black
-            zIndex: 10, 
+            backgroundColor: "rgba(0, 0, 0, 0.8)", // Semi-transparent black
+            zIndex: 10,
           }}
         />
       )}
@@ -265,7 +265,13 @@ export default function BigScreenPage() {
                 <motion.div
                   style={{
                     ...bubbleStyle,
-                    background: "linear-gradient(90deg, #526172, #0093B4)",
+                    //background: "linear-gradient(170deg, #2C3E50, #34495E)",
+                    background:
+                      "linear-gradient(160deg, #0F2027, #203A43, #2C5364)",
+                    //background: "linear-gradient(170deg, #232526, #414345)",
+                    //background: "linear-gradient(170deg, #1D2B32, #2C3E50)",
+                    //background: "linear-gradient(170deg, #1A1A2E, #16213E)",
+                    //background: "linear-gradient(170deg, #1A1A2E, #0B3D91)",
                     color: "#fff",
                     borderRadius: "10px",
                     padding: "1rem",
@@ -280,7 +286,16 @@ export default function BigScreenPage() {
                     flexGrow: 1,
                   }}
                 >
-                  <Typography variant="h6" sx={{ marginBottom: "0.5rem" }}>
+                  <Typography
+                    variant="h2"
+                    sx={{
+                      marginBottom: "0.5rem",
+                      background: "linear-gradient(45deg, #00FFFF, #00FFCC)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
+                    }}
+                  >
                     {entry.title}
                   </Typography>
                   {entry.description?.length > 0 && (
@@ -336,7 +351,7 @@ export default function BigScreenPage() {
                         background: "transparent",
                         borderRadius:
                           media.mediaType === "image" ? "50%" : "10px",
-                        boxShadow: "0 0 10px rgba(0, 255, 255, 0.8)",
+                          boxShadow: media.mediaType === "image" ? "0 0 10px rgba(0, 255, 255, 0.8)":"none",
                         overflow: "hidden",
                       }}
                     >
@@ -359,7 +374,7 @@ export default function BigScreenPage() {
                           controls={false}
                           style={{
                             width: "auto",
-                            height: "200px",
+                            height: "250px",
                             objectFit: "cover",
                             borderRadius: "10px",
                           }}
@@ -498,43 +513,97 @@ export default function BigScreenPage() {
                 zIndex: 20,
               }}
             >
-              {/* Title and Description */}
               {entry.title && (
                 <motion.div
                   style={{
                     ...bubbleStyle,
-                    background: "linear-gradient(90deg, #526172, #0093B4)",
+                    //background: "linear-gradient(170deg, #2C3E50, #34495E)",
+                    background:
+                      "linear-gradient(160deg, #0F2027, #203A43, #2C5364)",
+                    //background: "linear-gradient(170deg, #232526, #414345)",
+                    //background: "linear-gradient(170deg, #1D2B32, #2C3E50)",
+                    //background: "linear-gradient(170deg, #1A1A2E, #16213E)",
+                    //background: "linear-gradient(170deg, #1A1A2E, #0B3D91)",
                     color: "#fff",
                     borderRadius: "10px",
                     padding: "1rem",
-                    minWidth: "20rem",
-                    minHeight: "5rem",
+                    minWidth: "50rem",
                     overflow: "hidden",
                     display: "flex",
-                    flexDirection: "column",
+                    flexDirection: "column", // Stack title and description vertically
                     alignItems: "start",
                     textAlign: "left",
                     whiteSpace: "normal",
-                    flexGrow: 1,
                   }}
                 >
-                  <Typography variant="h6" sx={{ marginBottom: "0.5rem" }}>
+                  {/* Title */}
+                  <Typography
+                    variant="h2"
+                    sx={{
+                      marginBottom: "0.5rem",
+                      background: "linear-gradient(45deg, #00FFFF, #00FFCC)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
+                    }}
+                  >
                     {entry.title}
                   </Typography>
+
+                  {/* Description in Two Columns */}
                   {entry.description?.length > 0 && (
-                    <Box>
+                    <Box
+                      sx={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr", // Two columns
+                        gap: "1rem", // Space between columns
+                        width: "100%", // Ensure it takes full width
+                      }}
+                    >
                       {entry.description.length === 1 ? (
                         <Typography variant="body1">
                           {entry.description[0]}
                         </Typography>
                       ) : (
-                        <ul style={{ paddingLeft: "1rem", margin: 0 }}>
-                          {entry.description.map((desc, i) => (
-                            <li key={i}>
-                              <Typography variant="body1">{desc}</Typography>
-                            </li>
-                          ))}
-                        </ul>
+                        <>
+                          {/* First Column */}
+                          <Box>
+                            <ul style={{ paddingLeft: "1rem", margin: 0 }}>
+                              {entry.description
+                                .slice(
+                                  0,
+                                  Math.ceil(entry.description.length / 2)
+                                ) // First half of the list
+                                .map((desc, i) => (
+                                  <li key={i}>
+                                    <Typography variant="body1">
+                                      {desc}
+                                    </Typography>
+                                  </li>
+                                ))}
+                            </ul>
+                          </Box>
+
+                          {/* Second Column */}
+                          <Box>
+                            <ul style={{ paddingLeft: "1rem", margin: 0 }}>
+                              {entry.description
+                                .slice(Math.ceil(entry.description.length / 2)) // Second half of the list
+                                .map((desc, i) => (
+                                  <li
+                                    key={
+                                      i +
+                                      Math.ceil(entry.description.length / 2)
+                                    }
+                                  >
+                                    <Typography variant="body1">
+                                      {desc}
+                                    </Typography>
+                                  </li>
+                                ))}
+                            </ul>
+                          </Box>
+                        </>
                       )}
                     </Box>
                   )}
@@ -574,7 +643,7 @@ export default function BigScreenPage() {
                         background: "transparent",
                         borderRadius:
                           media.mediaType === "image" ? "50%" : "10px",
-                        boxShadow: "0 0 10px rgba(0, 255, 255, 0.8)",
+                        boxShadow: media.mediaType === "image" ? "0 0 10px rgba(0, 255, 255, 0.8)":"none",
                         overflow: "hidden",
                       }}
                     >
@@ -596,8 +665,8 @@ export default function BigScreenPage() {
                           loop
                           controls={false}
                           style={{
+                            maxHeight:"280px",
                             width: "auto",
-                            height: "200px",
                             objectFit: "cover",
                             borderRadius: "10px",
                           }}

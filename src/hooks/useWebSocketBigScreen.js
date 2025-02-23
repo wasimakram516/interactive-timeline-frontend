@@ -37,14 +37,14 @@ export default function useWebSocketBigScreen() {
 
     // ✅ Listen for selected year event
     socketInstance.on("animateYear", (eventData) => {
-      console.log(`🎉 Event received for year: ${eventData.year}`);
-      setSelectedEvent(eventData);
+      console.log(`🎉 Event received for year: ${eventData?.year || "null"}`);
+      setSelectedEvent(eventData); // eventData can be null
     });
 
     // ✅ Listen for selected program event
     socketInstance.on("animateProgram", (programData) => {
-      console.log(`📜 Program received for title: ${programData.title}`);
-      setSelectedProgram(programData);
+      console.log(`📜 Program received for title: ${programData?.title || "null"}`);
+      setSelectedProgram(programData); // programData can be null
     });
 
     setSocket(socketInstance);

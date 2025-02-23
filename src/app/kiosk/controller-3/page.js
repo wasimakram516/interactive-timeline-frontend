@@ -113,6 +113,12 @@ export default function ControllerThree() {
     borderRadius: "10px",
   };
 
+  const handleYearClick = (year) => {
+    const newSelectedYear = selectedYear === year ? null : year; // Toggle selection
+    setSelectedYear(newSelectedYear); // Update local state
+    sendYearSelection(newSelectedYear); // Emit to WebSocket
+  };
+  
   return (
     <Box
       sx={{
@@ -215,10 +221,7 @@ export default function ControllerThree() {
                   ...roundBubble,
                   ...(selectedYear === year ? selectedStyle : {}), // ✅ Apply rectangle style when selected
                 }}
-                onClick={() => {
-                  setSelectedYear(year); // ✅ Update selected year
-                  sendYearSelection(year);
-                }}
+                onClick={() => handleYearClick(year)}
               >
                 {year}
               </motion.div>
