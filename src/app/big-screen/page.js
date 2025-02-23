@@ -382,7 +382,6 @@ const programBubbleStyle = {
                       style={{
                         background: "transparent",
                         borderRadius: "10px",
-                        boxShadow: "0 0 10px rgba(0, 255, 255, 0.8)",
                         overflow: "hidden",
                       }}
                     >
@@ -390,9 +389,9 @@ const programBubbleStyle = {
                         src={infographic.url}
                         alt="Infographic"
                         style={{
-                          width: "200px",
-                          height: "150px",
-                          objectFit: "cover",
+                          width: "auto",
+                          height: "120px",
+                          objectFit: "contain",
                         }}
                       />
                     </motion.div>
@@ -629,8 +628,8 @@ const programBubbleStyle = {
                         src={infographic.url}
                         alt="Infographic"
                         style={{
-                          width: "200px",
-                          height: "150px",
+                          width: "auto",
+                          height: "120px",
                           objectFit: "cover",
                         }}
                       />
