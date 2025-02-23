@@ -27,6 +27,7 @@ export default function BigScreenPage() {
   const yearRefs = useRef([]);
   const [yearLineStyles, setYearLineStyles] = useState([]);
   const { width: windowWidth, height: windowHeight } = useWindowSize();
+  const [isBubbleActive, setIsBubbleActive] = useState(false);
 
   useEffect(() => {
     if (timelineRecords.length === 0) return;
@@ -66,6 +67,12 @@ export default function BigScreenPage() {
     });
   }, [timelineRecords, windowWidth, windowHeight]);
 
+  useEffect(() => {
+    // Check if any bubble is active
+    const isAnyBubbleActive = selectedEvent || selectedProgram;
+    setIsBubbleActive(!!isAnyBubbleActive);
+  }, [selectedEvent, selectedProgram]);
+
   // ✅ Shared Bubble Style
   const bubbleStyle = {
     boxShadow: "0px 0px 25px rgba(0, 255, 255, 1)",
@@ -82,19 +89,19 @@ export default function BigScreenPage() {
   };
 
   // Program Bubbles with Text Wrapping
-const programBubbleStyle = {
-  ...bubbleStyle, // Inherits shared bubble styles
-  whiteSpace: "normal", // Allows text to wrap
-  wordWrap: "break-word", // Ensures long words break to fit
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  textAlign: "center",
-  padding: "1rem", // Adds padding for better spacing
-  minWidth: "8rem", // Minimum width
-  maxWidth: "8rem", // Maximum width to prevent overflow
-  height: "8rem", // Height adjusts based on content
-};
+  const programBubbleStyle = {
+    ...bubbleStyle, // Inherits shared bubble styles
+    whiteSpace: "normal", // Allows text to wrap
+    wordWrap: "break-word", // Ensures long words break to fit
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    padding: "1rem", // Adds padding for better spacing
+    minWidth: "8rem", // Minimum width
+    maxWidth: "8rem", // Maximum width to prevent overflow
+    height: "8rem", // Height adjusts based on content
+  };
 
   const bubblePulseAnimation = {
     initial: { scale: 1 },
@@ -165,8 +172,24 @@ const programBubbleStyle = {
         width: "100vw",
         height: "85vh",
         userSelect: "none",
+        position:"relative"
       }}
     >
+      {/* Dark Overlay */}
+      {isBubbleActive && (
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100vh",
+            backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent black
+            zIndex: 10, 
+          }}
+        />
+      )}
+
       <Shift />
 
       <IconButton
