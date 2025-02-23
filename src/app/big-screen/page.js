@@ -479,8 +479,6 @@ const programBubbleStyle = {
               {/* Title and Description */}
               {entry.title && (
                 <motion.div
-                  initial={revealBounceAnimation.initial}
-                  animate={revealBounceAnimation.animate}
                   style={{
                     ...bubbleStyle,
                     background: "linear-gradient(90deg, #526172, #0093B4)",
