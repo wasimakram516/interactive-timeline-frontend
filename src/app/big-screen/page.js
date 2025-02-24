@@ -374,7 +374,7 @@ export default function BigScreenPage() {
                           controls={false}
                           style={{
                             width: "auto",
-                            height: "250px",
+                            height: "280px",
                             objectFit: "cover",
                             borderRadius: "10px",
                           }}
@@ -544,7 +544,7 @@ export default function BigScreenPage() {
                       background: "linear-gradient(45deg, #00FFFF, #00FFCC)",
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
-                      textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
+                      textShadow: "2px 2px 4px rgb(255, 255, 255)",
                     }}
                   >
                     {entry.title}
