@@ -293,7 +293,7 @@ export default function BigScreenPage() {
                       background: "linear-gradient(45deg, #00FFFF, #00FFCC)",
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
-                      textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
+                      textShadow: "2px 2px 4px rgba(255, 255, 255, 0.3)",
                     }}
                   >
                     {entry.title}
@@ -544,7 +544,7 @@ export default function BigScreenPage() {
                       background: "linear-gradient(45deg, #00FFFF, #00FFCC)",
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
-                      textShadow: "2px 2px 4px rgb(255, 255, 255)",
+                      textShadow: "2px 2px 4px rgba(255, 255, 255, 0.3)",
                     }}
                   >
                     {entry.title}
