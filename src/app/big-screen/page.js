@@ -451,15 +451,15 @@ export default function BigScreenPage() {
                         src={infographic.url}
                         alt="Infographic"
                         style={{
-                          width: "220px",
-                          height: "auto",
+                          width: "auto",
+                          height: "200px",
                           objectFit: "contain",
                         }}
                       />
                     </motion.div>
 
                     {/* Confetti Animation */}
-                    <Confetti x={infographicX} y={infographicY} loop={true} />
+                    {/* <Confetti x={infographicX} y={infographicY} loop={true} /> */}
                   </Box>
                 );
               })}
@@ -769,15 +769,15 @@ export default function BigScreenPage() {
                         src={infographic.url}
                         alt="Infographic"
                         style={{
-                          width: "200px",
-                          height: "auto",
+                          width: "auto",
+                          height: "200px",
                           objectFit: "contain",
                         }}
                       />
                     </motion.div>
 
                     {/* Confetti Animation */}
-                    <Confetti x={infographicX} y={infographicY} loop={true} />
+                    {/* <Confetti x={infographicX} y={infographicY} loop={true} /> */}
                   </Box>
                 );
               })}
