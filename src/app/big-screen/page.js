@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import useWebSocketBigScreen from "@/hooks/useWebSocketBigScreen";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Shift } from "ambient-cbg";
+import Confetti from "@/app/components/Confetti";
 
 function useWindowSize() {
   const [size, setSize] = useState({ width: 0, height: 0 });
@@ -192,6 +193,22 @@ export default function BigScreenPage() {
 
       <Shift />
 
+      {/* ✅ Takaful Logo - Centered at the Top */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 20,
+          left: "50%",
+          transform: "translateX(-50%)",
+        }}
+      >
+        <img
+          src="/logo-takaful.png"
+          alt="Takaful Oman"
+          style={{ height: "200px" }}
+        />
+      </Box>
+
       <IconButton
         sx={{
           position: "absolute",
@@ -351,7 +368,10 @@ export default function BigScreenPage() {
                         background: "transparent",
                         borderRadius:
                           media.mediaType === "image" ? "50%" : "10px",
-                          boxShadow: media.mediaType === "image" ? "0 0 10px rgba(0, 255, 255, 0.8)":"none",
+                        boxShadow:
+                          media.mediaType === "image"
+                            ? "0 0 10px rgba(0, 255, 255, 0.8)"
+                            : "none",
                         overflow: "hidden",
                       }}
                     >
@@ -390,18 +410,22 @@ export default function BigScreenPage() {
 
         {/* Infographics (Separate Block) */}
         {selectedEvent?.entries?.map((entry) => {
-          // Skip if xPosition or yPosition is null
           if (entry.xPosition === null || entry.yPosition === null) return null;
 
           return (
             <React.Fragment key={`infographics-${entry._id}`}>
               {entry.infographics?.map((infographic, i) => {
-                // Skip if xPosition or yPosition is null
                 if (
                   infographic.xPosition === null ||
                   infographic.yPosition === null
                 )
                   return null;
+
+                // Calculate the position of the infographic
+                const infographicX =
+                  (infographic.xPosition / 100) * window.innerWidth;
+                const infographicY =
+                  (infographic.yPosition / 100) * window.innerHeight;
 
                 return (
                   <Box
@@ -427,19 +451,21 @@ export default function BigScreenPage() {
                         src={infographic.url}
                         alt="Infographic"
                         style={{
-                          width: "auto",
-                          height: "120px",
+                          width: "220px",
+                          height: "auto",
                           objectFit: "contain",
                         }}
                       />
                     </motion.div>
+
+                    {/* Confetti Animation */}
+                    <Confetti x={infographicX} y={infographicY} loop={true} />
                   </Box>
                 );
               })}
             </React.Fragment>
           );
         })}
-
         {/* Lines Connecting Year Bubbles */}
         {yearLineStyles.map((style, idx) => (
           <motion.div
@@ -464,6 +490,22 @@ export default function BigScreenPage() {
 
       {/* 📌 RIGHT: Program Container (30%) */}
       <Box sx={{ width: "30%", height: "100%", position: "relative" }}>
+        <Typography
+          variant="h3"
+          color="lightgray"
+          sx={{
+            position: "absolute",
+            top: 50,
+            left: "50%",
+            textAlign: "center",
+            transform: "translateX(-50%)",
+            background: "rgba(0, 0, 0, 0.4)",
+            padding: "10px 20px",
+            borderRadius: "8px",
+          }}
+        >
+          Tech Innovations
+        </Typography>
         {/* Program Titles */}
         {programRecords.map((program, index) => {
           const isActive = selectedProgram?.title === program.title;
@@ -643,7 +685,10 @@ export default function BigScreenPage() {
                         background: "transparent",
                         borderRadius:
                           media.mediaType === "image" ? "50%" : "10px",
-                        boxShadow: media.mediaType === "image" ? "0 0 10px rgba(0, 255, 255, 0.8)":"none",
+                        boxShadow:
+                          media.mediaType === "image"
+                            ? "0 0 10px rgba(0, 255, 255, 0.8)"
+                            : "none",
                         overflow: "hidden",
                       }}
                     >
@@ -665,7 +710,7 @@ export default function BigScreenPage() {
                           loop
                           controls={false}
                           style={{
-                            maxHeight:"280px",
+                            maxHeight: "280px",
                             width: "auto",
                             objectFit: "cover",
                             borderRadius: "10px",
@@ -688,12 +733,17 @@ export default function BigScreenPage() {
           return (
             <React.Fragment key={`infographics-${entry._id}`}>
               {entry.infographics?.map((infographic, i) => {
-                // Skip if xPosition or yPosition is null
                 if (
                   infographic.xPosition === null ||
                   infographic.yPosition === null
                 )
                   return null;
+
+                // Calculate the position of the infographic
+                const infographicX =
+                  (infographic.xPosition / 100) * window.innerWidth;
+                const infographicY =
+                  (infographic.yPosition / 100) * window.innerHeight;
 
                 return (
                   <Box
@@ -712,7 +762,6 @@ export default function BigScreenPage() {
                       style={{
                         background: "transparent",
                         borderRadius: "10px",
-                        boxShadow: "0 0 10px rgba(0, 255, 255, 0.8)",
                         overflow: "hidden",
                       }}
                     >
@@ -720,12 +769,15 @@ export default function BigScreenPage() {
                         src={infographic.url}
                         alt="Infographic"
                         style={{
-                          width: "auto",
-                          height: "120px",
-                          objectFit: "cover",
+                          width: "200px",
+                          height: "auto",
+                          objectFit: "contain",
                         }}
                       />
                     </motion.div>
+
+                    {/* Confetti Animation */}
+                    <Confetti x={infographicX} y={infographicY} loop={true} />
                   </Box>
                 );
               })}

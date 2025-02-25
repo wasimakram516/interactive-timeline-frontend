@@ -48,7 +48,7 @@ export default function KioskSelection() {
           startIcon={<ScreenShareIcon />}
           onClick={() => router.push("/kiosk/controller-1")}
         >
-          Controller 1 (2014 - 2017)
+          Controller 1 (2014 - 2019)
         </Button>
         <Button
           variant="contained"
@@ -57,25 +57,16 @@ export default function KioskSelection() {
           startIcon={<ScreenShareIcon />}
           onClick={() => router.push("/kiosk/controller-2")}
         >
-          Controller 2 (2018 - 2021)
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          size="large"
-          startIcon={<ScreenShareIcon />}
-          onClick={() => router.push("/kiosk/controller-3")}
-        >
-          Controller 3 (2022 - 2025)
+          Controller 2 (2020 - 2025)
         </Button>
         <Button
           variant="contained"
           color="warning"
           size="large"
           startIcon={<ScreenShareIcon />}
-          onClick={() => router.push("/kiosk/controller-4")}
+          onClick={() => router.push("/kiosk/controller-3")}
         >
-          Controller 4 (Programs)
+          Controller 3 (Programs)
         </Button>
       </Box>
     </Box>

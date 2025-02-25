@@ -7,9 +7,6 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { motion } from "framer-motion";
 import { Shift } from "ambient-cbg";
 
-/**
- * Hook to listen for window resize events.
- */
 function useWindowSize() {
   const [size, setSize] = useState({ width: 0, height: 0 });
 
@@ -27,8 +24,8 @@ function useWindowSize() {
 
 export default function ControllerOne() {
   const router = useRouter();
-  const { sendYearSelection } = useWebSocketKiosk();
-  const timelineYears = [2014, 2015, 2016, 2017]; // ✅ Fixed Year Range
+  const { sendYearSelection, receivedYearSelection } = useWebSocketKiosk();
+  const timelineYears = [2014, 2015, 2016, 2017, 2018, 2019];
   const scrollContainerRef = useRef(null);
   const yearRefs = useRef([]);
   const [lineStyles, setLineStyles] = useState([]);
@@ -80,12 +77,18 @@ export default function ControllerOne() {
     recalcLines();
   }, [timelineYears, windowWidth]);
 
+  // ✅ Listen for WebSocket Updates
+  useEffect(() => {
+    if (receivedYearSelection !== selectedYear) {
+      setSelectedYear(receivedYearSelection); // Update local state based on WebSocket event
+    }
+  }, [receivedYearSelection]);
+
   // ✅ Bubble Style (Default)
   const roundBubble = {
     background: "radial-gradient(circle, #009688, #00796b)",
     boxShadow: "0px 0px 20px rgba(0, 255, 204, 0.8)",
     color: "white",
-    fontSize: "1.5rem",
     width: "10rem",
     height: "10rem",
     borderRadius: "50%",
@@ -107,14 +110,13 @@ export default function ControllerOne() {
     background: "linear-gradient(90deg, #0088ff, #00ffcc)",
     boxShadow: "0px 0px 25px rgba(0, 255, 255, 1)",
     color: "#000",
-    fontSize: "1.6rem",
     width: "12rem",
     height: "8rem",
     borderRadius: "10px",
   };
 
   const handleYearClick = (year) => {
-    const newSelectedYear = selectedYear === year ? null : year; // Toggle selection
+    const newSelectedYear = selectedYear === year ? null : year;
     setSelectedYear(newSelectedYear); // Update local state
     sendYearSelection(newSelectedYear); // Emit to WebSocket
   };
@@ -136,25 +138,18 @@ export default function ControllerOne() {
     >
       <Shift />
 
+      {/* ✅ Takaful Logo - Centered at the Top */}
+      <Box sx={{ position: "absolute", top: 30, left: "50%", transform: "translateX(-50%)" }}>
+        <img src="/logo-takaful.png" alt="Takaful Oman" style={{ height: "250px" }} />
+      </Box>
+
+      {/* ✅ Back Button */}
       <IconButton
-        sx={{ position: "absolute", top: 20, left: 20, color: "white" }}
+        sx={{ position: "absolute", top: 20, left: 20, color: "white", zIndex:999 }}
         onClick={() => router.push("/kiosk")}
       >
         <ArrowBackIcon />
       </IconButton>
-
-      <Typography
-        variant="h3"
-        color="white"
-        fontWeight="bold"
-        mb={4}
-        sx={{ userSelect: "none" }}
-      >
-        🎮 Controller 1
-      </Typography>
-      <Typography variant="h6" color="lightgray" mb={4}>
-        Manage Timeline Years 2014 - 2017
-      </Typography>
 
       <Box
         ref={scrollContainerRef}
@@ -167,7 +162,7 @@ export default function ControllerOne() {
           overflowX: "auto",
           overflowY: "hidden",
           padding: "0.5rem",
-          height: "70vh",
+          height: "100vh",
           userSelect: "none",
         }}
       >
@@ -203,8 +198,8 @@ export default function ControllerOne() {
                 flexDirection: "column",
                 alignItems: "center",
                 position: "relative",
-                marginLeft: "10vw",
-                marginRight: "10vw",
+                marginLeft: "8vw",
+                marginRight: "8vw",
                 transform: `translateY(${translateY})`,
                 zIndex: 5,
                 userSelect: "none",
@@ -219,7 +214,7 @@ export default function ControllerOne() {
                 transition={{ duration: 0.5 }}
                 style={{
                   ...roundBubble,
-                  ...(selectedYear === year ? selectedStyle : {}), // ✅ Apply rectangle style when selected
+                  ...(selectedYear === year ? selectedStyle : {}),
                 }}
                 onClick={() => handleYearClick(year)} 
               >
@@ -229,6 +224,20 @@ export default function ControllerOne() {
           );
         })}
       </Box>
+
+      {/* ✅ Click Instruction - Bottom Center */}
+      <Typography
+        variant="h3"
+        sx={{
+          position: "absolute",
+          bottom: 30,
+          background: "rgba(0, 0, 0, 0.4)",
+          padding: "10px 20px",
+          borderRadius: "8px",
+        }}
+      >
+        Click on the year to see our journey
+      </Typography>
     </Box>
   );
 }

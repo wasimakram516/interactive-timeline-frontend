@@ -6,6 +6,7 @@ export default function useWebSocketKiosk() {
   const [socket, setSocket] = useState(null);
   const [timelineYears, setTimelineYears] = useState([]);
   const [programTitles, setProgramTitles] = useState([]);
+  const [receivedYearSelection, setReceivedYearSelection] = useState(null);
 
   useEffect(() => {
     const socketInstance = io(process.env.NEXT_PUBLIC_WEBSOCKET_HOST, { transports: ["websocket"] });
@@ -15,16 +16,23 @@ export default function useWebSocketKiosk() {
       socketInstance.emit("register", "kiosk");
     });
 
-    // ✅ Listen for timeline updates
+    // Listen for timeline updates
     socketInstance.on("timelineUpdate", (data) => {
       console.log("📅 Timeline Data Received:", data);
       setTimelineYears(data.map((event) => event.year)); // Extract years
     });
 
-    // ✅ Listen for program updates
+    // Listen for program updates
     socketInstance.on("programUpdate", (data) => {
       console.log("📜 Program Data Received:", data);
       setProgramTitles(data.map((program) => program.title)); // Extract program titles
+    });
+
+    // Listen for year selection updates
+    socketInstance.on("yearSelected", (year) => {
+      console.log("📅 Year Selected:", year);
+      console.log("📅 Received year selection:", year);
+      setReceivedYearSelection(year);
     });
 
     setSocket(socketInstance);
@@ -44,5 +52,11 @@ export default function useWebSocketKiosk() {
     }
   };
 
-  return { timelineYears, programTitles, sendYearSelection, sendProgramSelection };
+  return { 
+    timelineYears, 
+    programTitles, 
+    sendYearSelection, 
+    sendProgramSelection, 
+    receivedYearSelection 
+  };
 }
