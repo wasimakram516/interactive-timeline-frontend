@@ -7,8 +7,9 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  // Hello World
   return (
-    <html lang="en">
+    <html lang="en"> 
       <body>
       <ThemeRegistry>{children}</ThemeRegistry>
       </body>
