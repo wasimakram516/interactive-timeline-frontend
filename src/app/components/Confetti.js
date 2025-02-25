@@ -17,14 +17,14 @@ export default function Confetti({ loop = true }) {
 
     const frame = () => {
       myConfetti({
-        particleCount: 3,
+        particleCount: 5,
         angle: 60,
         spread: 70,
         origin: { x: 0.5, y: 0.5 }, // Center of the canvas
       });
 
       myConfetti({
-        particleCount: 10,
+        particleCount: 5,
         angle: 120,
         spread: 70,
         origin: { x: 0.5, y: 0.5 }, // Center of the canvas
