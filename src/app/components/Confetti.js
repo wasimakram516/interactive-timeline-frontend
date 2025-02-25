@@ -2,7 +2,7 @@
 import { useEffect, useRef } from "react";
 import confetti from "canvas-confetti";
 
-export default function Confetti({ x, y, loop = true }) {
+export default function Confetti({ loop = true }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -17,17 +17,17 @@ export default function Confetti({ x, y, loop = true }) {
 
     const frame = () => {
       myConfetti({
-        particleCount: 3, 
+        particleCount: 3,
         angle: 60,
         spread: 70,
-        origin: { x: x / window.innerWidth, y: y / window.innerHeight },
+        origin: { x: 0.5, y: 0.5 }, // Center of the canvas
       });
 
       myConfetti({
         particleCount: 10,
         angle: 120,
         spread: 70,
-        origin: { x: x / window.innerWidth, y: y / window.innerHeight },
+        origin: { x: 0.5, y: 0.5 }, // Center of the canvas
       });
 
       if (loop) {
@@ -45,7 +45,7 @@ export default function Confetti({ x, y, loop = true }) {
       }
       myConfetti.reset();
     };
-  }, [x, y, loop]);
+  }, [loop]);
 
   return (
     <canvas
@@ -54,6 +54,8 @@ export default function Confetti({ x, y, loop = true }) {
         position: "fixed",
         top: 0,
         left: 0,
+        width: "100%",
+        height: "100%",
         pointerEvents: "none",
         zIndex: 9999,
       }}
