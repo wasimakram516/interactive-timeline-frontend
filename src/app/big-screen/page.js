@@ -452,7 +452,7 @@ export default function BigScreenPage() {
                         alt="Infographic"
                         style={{
                           width: "auto",
-                          height: "180px",
+                          height: "120px",
                           objectFit: "contain",
                         }}
                       />
@@ -770,7 +770,7 @@ export default function BigScreenPage() {
                         alt="Infographic"
                         style={{
                           width: "auto",
-                          height: "180px",
+                          height: "120px",
                           objectFit: "contain",
                         }}
                       />
