@@ -196,7 +196,41 @@ export default function BigScreenPage() {
         />
       )}
 
-      {/* Loading Animation */}
+      <Shift />
+
+      {/* ✅ Takaful Logo - Centered at the Top */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 20,
+          left: "50%",
+          transform: "translateX(-50%)",
+        }}
+      >
+        <img
+          src="/logo-takaful.png"
+          alt="Takaful Oman"
+          style={{ height: "200px" }}
+        />
+      </Box>
+
+      <IconButton
+        sx={{
+          position: "absolute",
+          top: 20,
+          left: 20,
+          color: "white",
+          zIndex: 99,
+        }}
+        onClick={() => router.push("/")}
+      >
+        <ArrowBackIcon />
+      </IconButton>
+
+      {/* 📌 LEFT: Timeline Container (70%) */}
+      <Box sx={{ width: "70%", height: "100%", position: "relative" }}>
+
+        {/* Loading Animation */}
       {isLoading && (
         <Box
           sx={{
@@ -237,39 +271,6 @@ export default function BigScreenPage() {
         </Box>
       )}
 
-      <Shift />
-
-      {/* ✅ Takaful Logo - Centered at the Top */}
-      <Box
-        sx={{
-          position: "absolute",
-          top: 20,
-          left: "50%",
-          transform: "translateX(-50%)",
-        }}
-      >
-        <img
-          src="/logo-takaful.png"
-          alt="Takaful Oman"
-          style={{ height: "200px" }}
-        />
-      </Box>
-
-      <IconButton
-        sx={{
-          position: "absolute",
-          top: 20,
-          left: 20,
-          color: "white",
-          zIndex: 99,
-        }}
-        onClick={() => router.push("/")}
-      >
-        <ArrowBackIcon />
-      </IconButton>
-
-      {/* 📌 LEFT: Timeline Container (70%) */}
-      <Box sx={{ width: "70%", height: "100%", position: "relative" }}>
         {/* Timeline Years */}
         {!isLoading &&
           timelineRecords.map((year, index) => {
