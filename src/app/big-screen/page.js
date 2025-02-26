@@ -562,8 +562,7 @@ export default function BigScreenPage() {
           Tech Innovations
         </Typography>
         {/* Program Titles */}
-        {!isLoading &&
-          programRecords.map((program, index) => {
+        {programRecords.map((program, index) => {
             const isActive = selectedProgram?.title === program.title;
 
             return (
@@ -596,8 +595,7 @@ export default function BigScreenPage() {
           })}
 
         {/* Title and Description (Separate Block) */}
-        {!isLoading &&
-          selectedProgram?.entries?.map((entry) => {
+        {selectedProgram?.entries?.map((entry) => {
             // Skip if xPosition or yPosition is null
             if (entry.xPosition === null || entry.yPosition === null)
               return null;
@@ -716,8 +714,7 @@ export default function BigScreenPage() {
           })}
 
         {/* Media (Separate Block) */}
-        {!isLoading &&
-          selectedProgram?.entries?.map((entry) => {
+        {selectedProgram?.entries?.map((entry) => {
             // Skip if xPosition or yPosition is null
             if (entry.xPosition === null || entry.yPosition === null)
               return null;
@@ -788,8 +785,7 @@ export default function BigScreenPage() {
           })}
 
         {/* Infographics (Separate Block) */}
-        {!isLoading &&
-          selectedProgram?.entries?.map((entry) => {
+        {selectedProgram?.entries?.map((entry) => {
             // Skip if xPosition or yPosition is null
             if (entry.xPosition === null || entry.yPosition === null)
               return null;
