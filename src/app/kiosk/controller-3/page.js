@@ -153,12 +153,29 @@ export default function ControllerFour() {
       <Shift />
 
       {/* ✅ Takaful Logo - Centered at the Top */}
-      <Box sx={{ position: "absolute", top: 30, left: "50%", transform: "translateX(-50%)" }}>
-        <img src="/logo-takaful.png" alt="Takaful Oman" style={{ height: "250px" }} />
+      <Box
+        sx={{
+          position: "absolute",
+          top: 30,
+          left: "50%",
+          transform: "translateX(-50%)",
+        }}
+      >
+        <img
+          src="/logo-takaful.png"
+          alt="Takaful Oman"
+          style={{ height: "250px" }}
+        />
       </Box>
 
       <IconButton
-        sx={{ position: "absolute", top: 20, left: 20, color: "white", zIndex:999 }}
+        sx={{
+          position: "absolute",
+          top: 20,
+          left: 20,
+          color: "white",
+          zIndex: 999,
+        }}
         onClick={() => router.push("/kiosk")}
       >
         <ArrowBackIcon />
@@ -202,44 +219,50 @@ export default function ControllerFour() {
         ))}
 
         {/* ✅ Display Titles as Selectable Bubbles */}
-        {programTitles.map((title, index) => {
-          const translateY = index % 2 === 1 ? "-3rem" : "3rem";
+        {/* ✅ Sort program titles in the required order before mapping */}
+        {[...programTitles]
+          .sort((a, b) => {
+            const order = ["AI Vehicle Inspection", "IPDS", "ICAS", "LVS"]; // ✅ Custom Order
+            return order.indexOf(a) - order.indexOf(b); // Sort based on predefined order
+          })
+          .map((title, index) => {
+            const translateY = index % 2 === 1 ? "-3rem" : "3rem";
 
-          return (
-            <Box
-              key={`${title}-${index}`} // ✅ Ensure Unique Key by Appending Index
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                position: "relative",
-                marginLeft: "10vw",
-                marginRight: "10vw",
-                transform: `translateY(${translateY})`,
-                zIndex: 5,
-                userSelect: "none",
-              }}
-            >
-              <motion.div
-                ref={(el) => (titleRefs.current[index] = el)}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                whileHover={{ scale: 1.2, transition: { duration: 0.3 } }}
-                whileTap={{ scale: 0.85, transition: { duration: 0.1 } }}
-                transition={{ duration: 0.5 }}
-                style={{
-                  ...programBubbleStyle,
-                  ...(selectedTitle === title ? selectedStyle : {}), // ✅ Transform into rectangle when selected
+            return (
+              <Box
+                key={`${title}-${index}`} // ✅ Ensure Unique Key by Appending Index
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  position: "relative",
+                  marginLeft: "10vw",
+                  marginRight: "10vw",
+                  transform: `translateY(${translateY})`,
+                  zIndex: 5,
+                  userSelect: "none",
                 }}
-                onClick={() => handleTitleClick(title)}
               >
-                {title}
-              </motion.div>
-            </Box>
-          );
-        })}
+                <motion.div
+                  ref={(el) => (titleRefs.current[index] = el)}
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  whileHover={{ scale: 1.2, transition: { duration: 0.3 } }}
+                  whileTap={{ scale: 0.85, transition: { duration: 0.1 } }}
+                  transition={{ duration: 0.5 }}
+                  style={{
+                    ...programBubbleStyle,
+                    ...(selectedTitle === title ? selectedStyle : {}), // ✅ Transform into rectangle when selected
+                  }}
+                  onClick={() => handleTitleClick(title)}
+                >
+                  {title}
+                </motion.div>
+              </Box>
+            );
+          })}
       </Box>
-      
+
       {/* ✅ Click Instruction - Bottom Center */}
       <Typography
         variant="h3"
