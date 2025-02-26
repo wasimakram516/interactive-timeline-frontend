@@ -61,12 +61,21 @@ export default function KioskSelection() {
         </Button>
         <Button
           variant="contained"
+          color="success"
+          size="large"
+          startIcon={<ScreenShareIcon />}
+          onClick={() => router.push("/kiosk/controller-3")}
+        >
+          Controller 3 (2014 - 2025)
+        </Button>
+        <Button
+          variant="contained"
           color="warning"
           size="large"
           startIcon={<ScreenShareIcon />}
           onClick={() => router.push("/kiosk/controller-3")}
         >
-          Controller 3 (Programs)
+          Controller 4 (Programs)
         </Button>
       </Box>
     </Box>

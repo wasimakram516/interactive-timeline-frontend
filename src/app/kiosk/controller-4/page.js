@@ -7,6 +7,9 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { motion } from "framer-motion";
 import { Shift } from "ambient-cbg";
 
+/**
+ * Hook to listen for window resize events.
+ */
 function useWindowSize() {
   const [size, setSize] = useState({ width: 0, height: 0 });
 
@@ -22,34 +25,33 @@ function useWindowSize() {
   return size;
 }
 
-export default function ControllerTwo() {
+export default function ControllerFour() {
   const router = useRouter();
-  const { sendYearSelection, receivedYearSelection } = useWebSocketKiosk();
-  const timelineYears = [2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025];
+  const { programTitles, sendProgramSelection } = useWebSocketKiosk();
   const scrollContainerRef = useRef(null);
-  const yearRefs = useRef([]);
+  const titleRefs = useRef([]);
   const [lineStyles, setLineStyles] = useState([]);
   const { width: windowWidth } = useWindowSize();
-  const [selectedYear, setSelectedYear] = useState(null);
+  const [selectedTitle, setSelectedTitle] = useState(null); // ✅ Store the selected title
 
   useEffect(() => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollLeft = 0;
     }
-  }, [timelineYears]);
+  }, [programTitles]);
 
   useEffect(() => {
     const containerEl = scrollContainerRef.current;
-    if (!containerEl || yearRefs.current.length < 2) return;
+    if (!containerEl || titleRefs.current.length < 2) return;
 
     const recalcLines = () => {
       requestAnimationFrame(() => {
         const newStyles = [];
         const containerRect = containerEl.getBoundingClientRect();
 
-        for (let i = 0; i < yearRefs.current.length - 1; i++) {
-          const rectA = yearRefs.current[i]?.getBoundingClientRect();
-          const rectB = yearRefs.current[i + 1]?.getBoundingClientRect();
+        for (let i = 0; i < titleRefs.current.length - 1; i++) {
+          const rectA = titleRefs.current[i]?.getBoundingClientRect();
+          const rectB = titleRefs.current[i + 1]?.getBoundingClientRect();
           if (!rectA || !rectB) continue;
 
           const AcenterX = rectA.left - containerRect.left + rectA.width / 2;
@@ -75,29 +77,20 @@ export default function ControllerTwo() {
     };
 
     recalcLines();
-  }, [timelineYears, windowWidth]);
+  }, [programTitles, windowWidth]);
 
-  // ✅ Listen for WebSocket Updates
-  useEffect(() => {
-    if (receivedYearSelection !== selectedYear) {
-      setSelectedYear(receivedYearSelection); // Update local state based on WebSocket event
-    }
-  }, [receivedYearSelection]);
-
-  // ✅ Bubble Style (Default)
+  // ✅ Default Bubble Style
   const roundBubble = {
     background: "radial-gradient(circle, #009688, #00796b)",
     boxShadow: "0px 0px 20px rgba(0, 255, 204, 0.8)",
     color: "white",
-    width: "8rem",
-    height: "8rem",
+    fontSize: "1.5rem",
     borderRadius: "50%",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     textAlign: "center",
     fontWeight: "bold",
-    fontSize: "1.4rem",
     padding: "0.5rem",
     position: "absolute",
     userSelect: "none",
@@ -105,20 +98,41 @@ export default function ControllerTwo() {
     cursor: "pointer",
   };
 
-  // ✅ Selected Style (Rectangle)
+  const programBubbleStyle = {
+    ...roundBubble, // Inherits shared bubble styles
+    whiteSpace: "normal", // Allows text to wrap
+    wordWrap: "break-word", // Ensures long words break to fit
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    padding: "1rem", // Adds padding for better spacing
+    minWidth: "10rem", // Minimum width
+    height: "10rem", // Height adjusts based on content
+  };
+
+  // ✅ Selected Title Style (Rectangle)
   const selectedStyle = {
     background: "linear-gradient(90deg, #0088ff, #00ffcc)",
     boxShadow: "0px 0px 25px rgba(0, 255, 255, 1)",
+    whiteSpace: "normal", // Allows text to wrap
+    wordWrap: "break-word",
     color: "#000",
-    width: "10rem",
+    fontSize: "1.4rem",
+    width: "12rem",
     height: "8rem",
+    padding: "1rem 1.5rem",
     borderRadius: "10px",
+    textAlign: "center",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   };
 
-  const handleYearClick = (year) => {
-    const newSelectedYear = selectedYear === year ? null : year;
-    setSelectedYear(newSelectedYear); // Update local state
-    sendYearSelection(newSelectedYear); // Emit to WebSocket
+  const handleTitleClick = (title) => {
+    const newSelectedTitle = selectedTitle === title ? null : title; // Toggle selection
+    setSelectedTitle(newSelectedTitle); // Update local state
+    sendProgramSelection(newSelectedTitle); // Emit to WebSocket
   };
 
   return (
@@ -128,7 +142,7 @@ export default function ControllerTwo() {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        height: "calc(100vh - 10px)",
+        height: "100vh",
         width: "100vw",
         color: "white",
         textAlign: "center",
@@ -139,13 +153,29 @@ export default function ControllerTwo() {
       <Shift />
 
       {/* ✅ Takaful Logo - Centered at the Top */}
-      <Box sx={{ position: "absolute", top: 30, left: "50%", transform: "translateX(-50%)" }}>
-        <img src="/logo-takaful.png" alt="Takaful Oman" style={{ height: "250px" }} />
+      <Box
+        sx={{
+          position: "absolute",
+          top: 30,
+          left: "50%",
+          transform: "translateX(-50%)",
+        }}
+      >
+        <img
+          src="/logo-takaful.png"
+          alt="Takaful Oman"
+          style={{ height: "250px" }}
+        />
       </Box>
 
-      {/* ✅ Back Button */}
       <IconButton
-        sx={{ position: "absolute", top: 20, left: 20, color: "white", zIndex:999}}
+        sx={{
+          position: "absolute",
+          top: 20,
+          left: 20,
+          color: "white",
+          zIndex: 999,
+        }}
         onClick={() => router.push("/kiosk")}
       >
         <ArrowBackIcon />
@@ -158,10 +188,15 @@ export default function ControllerTwo() {
           alignItems: "center",
           justifyContent: "center",
           position: "relative",
-          height: "100vh",
+          maxWidth: "100vw",
+          overflowX: "auto",
+          overflowY: "hidden",
+          padding: "0.5rem",
+          height: "70vh",
           userSelect: "none",
         }}
       >
+        {/* ✅ Draw Connecting Lines */}
         {lineStyles.map((style, idx) => (
           <motion.div
             key={idx}
@@ -183,42 +218,49 @@ export default function ControllerTwo() {
           />
         ))}
 
-        {timelineYears.map((year, index) => {
-          const translateY = index % 2 === 1 ? "-8rem" : "8rem";
+        {/* ✅ Display Titles as Selectable Bubbles */}
+        {/* ✅ Sort program titles in the required order before mapping */}
+        {[...programTitles]
+          .sort((a, b) => {
+            const order = ["AI Vehicle Inspection", "IPDS", "ICAS", "LVS"]; // ✅ Custom Order
+            return order.indexOf(a) - order.indexOf(b); // Sort based on predefined order
+          })
+          .map((title, index) => {
+            const translateY = index % 2 === 1 ? "-3rem" : "3rem";
 
-          return (
-            <Box
-              key={year}
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                position: "relative",
-                marginLeft: "4vw",
-                marginRight: "4vw",
-                transform: `translateY(${translateY})`,
-                zIndex: 5,
-                userSelect: "none",
-              }}
-            >
-              <motion.div
-                ref={(el) => (yearRefs.current[index] = el)}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                whileHover={{ scale: 1.3, transition: { duration: 0.3 } }}
-                whileTap={{ scale: 0.85, transition: { duration: 0.1 } }}
-                transition={{ duration: 0.5 }}
-                style={{
-                  ...roundBubble,
-                  ...(selectedYear === year ? selectedStyle : {}),
+            return (
+              <Box
+                key={`${title}-${index}`} // ✅ Ensure Unique Key by Appending Index
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  position: "relative",
+                  marginLeft: "10vw",
+                  marginRight: "10vw",
+                  transform: `translateY(${translateY})`,
+                  zIndex: 5,
+                  userSelect: "none",
                 }}
-                onClick={() => handleYearClick(year)} 
               >
-                {year}
-              </motion.div>
-            </Box>
-          );
-        })}
+                <motion.div
+                  ref={(el) => (titleRefs.current[index] = el)}
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  whileHover={{ scale: 1.2, transition: { duration: 0.3 } }}
+                  whileTap={{ scale: 0.85, transition: { duration: 0.1 } }}
+                  transition={{ duration: 0.5 }}
+                  style={{
+                    ...programBubbleStyle,
+                    ...(selectedTitle === title ? selectedStyle : {}), // ✅ Transform into rectangle when selected
+                  }}
+                  onClick={() => handleTitleClick(title)}
+                >
+                  {title}
+                </motion.div>
+              </Box>
+            );
+          })}
       </Box>
 
       {/* ✅ Click Instruction - Bottom Center */}
@@ -232,7 +274,7 @@ export default function ControllerTwo() {
           borderRadius: "8px",
         }}
       >
-        Click on the year to see our journey
+        Click on the Title to see our Innovations
       </Typography>
     </Box>
   );
