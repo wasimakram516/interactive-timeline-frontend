@@ -8,6 +8,7 @@ export default function useWebSocketBigScreen() {
   const [programRecords, setProgramRecords] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedProgram, setSelectedProgram] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const WS_HOST = process.env.NEXT_PUBLIC_WEBSOCKET_HOST;
 
   useEffect(() => {
@@ -38,13 +39,21 @@ export default function useWebSocketBigScreen() {
     // ✅ Listen for selected year event
     socketInstance.on("animateYear", (eventData) => {
       console.log(`🎉 Event received for year: ${eventData?.year || "null"}`);
-      setSelectedEvent(eventData); // eventData can be null
+      setIsLoading(true); // Start loading
+      setTimeout(() => {
+        setSelectedEvent(eventData); // Set event data after delay
+        setIsLoading(false); // Stop loading
+      }, 2000); // Simulate a 2-second loading delay
     });
 
     // ✅ Listen for selected program event
     socketInstance.on("animateProgram", (programData) => {
       console.log(`📜 Program received for title: ${programData?.title || "null"}`);
-      setSelectedProgram(programData); // programData can be null
+      setIsLoading(true); // Start loading
+      setTimeout(() => {
+        setSelectedProgram(programData); // Set program data after delay
+        setIsLoading(false); // Stop loading
+      }, 2000); // Simulate a 2-second loading delay
     });
 
     setSocket(socketInstance);
@@ -54,5 +63,5 @@ export default function useWebSocketBigScreen() {
     };
   }, [WS_HOST]);
 
-  return { timelineRecords, programRecords, selectedEvent, selectedProgram };
+  return { timelineRecords, programRecords, selectedEvent, selectedProgram, isLoading };
 }

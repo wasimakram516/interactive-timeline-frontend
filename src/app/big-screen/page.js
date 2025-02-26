@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState, useRef } from "react";
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, IconButton, Typography, CircularProgress } from "@mui/material";
 import { motion } from "framer-motion";
 import useWebSocketBigScreen from "@/hooks/useWebSocketBigScreen";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -22,7 +22,7 @@ function useWindowSize() {
 
 export default function BigScreenPage() {
   const router = useRouter();
-  const { timelineRecords, programRecords, selectedEvent, selectedProgram } =
+  const { timelineRecords, programRecords, selectedEvent, selectedProgram, isLoading } =
     useWebSocketBigScreen();
 
   const yearRefs = useRef([]);
@@ -191,6 +191,24 @@ export default function BigScreenPage() {
         />
       )}
 
+      {/* Loading Animation */}
+      {isLoading && (
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            background:"transparemt",
+            zIndex: 40, 
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <CircularProgress size={120} color="primary" /> {/* Loading spinner */}
+        </Box>
+      )}
       <Shift />
 
       {/* ✅ Takaful Logo - Centered at the Top */}
@@ -225,7 +243,7 @@ export default function BigScreenPage() {
       {/* 📌 LEFT: Timeline Container (70%) */}
       <Box sx={{ width: "70%", height: "100%", position: "relative" }}>
         {/* Timeline Years */}
-        {timelineRecords.map((year, index) => {
+        {!isLoading && timelineRecords.map((year, index) => {
           const isActive = selectedEvent?.year === year.year;
 
           return (
@@ -263,7 +281,7 @@ export default function BigScreenPage() {
         })}
 
         {/* Title and Description (Separate Block) */}
-        {selectedEvent?.entries?.map((entry) => {
+        {!isLoading && selectedEvent?.entries?.map((entry) => {
           // Skip if xPosition or yPosition is null
           if (entry.xPosition === null || entry.yPosition === null) return null;
 
@@ -340,7 +358,7 @@ export default function BigScreenPage() {
         })}
 
         {/* Media (Separate Block) */}
-        {selectedEvent?.entries?.map((entry) => {
+        {!isLoading && selectedEvent?.entries?.map((entry) => {
           // Skip if xPosition or yPosition is null
           if (entry.xPosition === null || entry.yPosition === null) return null;
 
@@ -410,7 +428,7 @@ export default function BigScreenPage() {
         })}
 
         {/* Infographics (Separate Block) */}
-        {selectedEvent?.entries?.map((entry) => {
+        {!isLoading && selectedEvent?.entries?.map((entry) => {
           if (entry.xPosition === null || entry.yPosition === null) return null;
 
           return (
@@ -468,7 +486,7 @@ export default function BigScreenPage() {
           );
         })}
         {/* Lines Connecting Year Bubbles */}
-        {yearLineStyles.map((style, idx) => (
+        {!isLoading && yearLineStyles.map((style, idx) => (
           <motion.div
             key={idx}
             initial={{ width: 0 }}
@@ -508,7 +526,7 @@ export default function BigScreenPage() {
           Tech Innovations
         </Typography>
         {/* Program Titles */}
-        {programRecords.map((program, index) => {
+        {!isLoading && programRecords.map((program, index) => {
           const isActive = selectedProgram?.title === program.title;
 
           return (
@@ -542,7 +560,7 @@ export default function BigScreenPage() {
         })}
 
         {/* Title and Description (Separate Block) */}
-        {selectedProgram?.entries?.map((entry) => {
+        {!isLoading && selectedProgram?.entries?.map((entry) => {
           // Skip if xPosition or yPosition is null
           if (entry.xPosition === null || entry.yPosition === null) return null;
 
@@ -658,7 +676,7 @@ export default function BigScreenPage() {
         })}
 
         {/* Media (Separate Block) */}
-        {selectedProgram?.entries?.map((entry) => {
+        {!isLoading && selectedProgram?.entries?.map((entry) => {
           // Skip if xPosition or yPosition is null
           if (entry.xPosition === null || entry.yPosition === null) return null;
 
@@ -728,7 +746,7 @@ export default function BigScreenPage() {
         })}
 
         {/* Infographics (Separate Block) */}
-        {selectedProgram?.entries?.map((entry) => {
+        {!isLoading && selectedProgram?.entries?.map((entry) => {
           // Skip if xPosition or yPosition is null
           if (entry.xPosition === null || entry.yPosition === null) return null;
 
