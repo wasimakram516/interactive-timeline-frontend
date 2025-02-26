@@ -193,22 +193,45 @@ export default function BigScreenPage() {
 
       {/* Loading Animation */}
       {isLoading && (
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            background:"transparemt",
-            zIndex: 40, 
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <CircularProgress size={120} color="primary" /> {/* Loading spinner */}
-        </Box>
-      )}
+  <Box
+    sx={{
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+      background: "transparent",
+      zIndex: 40,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: "15px",
+    }}
+  >
+    {[0, 1, 2].map((index) => (
+      <motion.div
+        key={index}
+        style={{
+          width: "15px",
+          height: "50px",
+          background: "linear-gradient(45deg, #00ffcc, #0088ff)",
+          borderRadius: "8px",
+        }}
+        initial={{ y: 0 }}
+        animate={{
+          y: [0, -20, 0],
+          transition: {
+            duration: 1,
+            repeat: Infinity,
+            repeatType: "mirror",
+            ease: "easeInOut",
+            delay: index * 0.2,
+          },
+        }}
+      />
+    ))}
+  </Box>
+)}
+
       <Shift />
 
       {/* ✅ Takaful Logo - Centered at the Top */}
