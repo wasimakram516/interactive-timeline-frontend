@@ -292,7 +292,7 @@ export default function BigScreenPage() {
                     color: "#fff",
                     borderRadius: "10px",
                     padding: "1rem",
-                    minWidth: "17rem",
+                    minWidth: "19rem",
                     minHeight: "5rem",
                     overflow: "hidden",
                     display: "flex",
@@ -569,7 +569,7 @@ export default function BigScreenPage() {
                     color: "#fff",
                     borderRadius: "10px",
                     padding: "1rem",
-                    minWidth: "50rem",
+                    minWidth: "52rem",
                     overflow: "hidden",
                     display: "flex",
                     flexDirection: "column", // Stack title and description vertically

@@ -17,13 +17,13 @@ const theme = createTheme({
       fontSize: "1.5rem",
     },
     h5: {
-      fontSize: "1.25rem",
+      fontSize: "1.3rem",
     },
     h6: {
-      fontSize: "1rem",
+      fontSize: "1.25rem",
     },
     body1: {
-      fontSize: "1rem",
+      fontSize: "1.175rem",
     },
     body2: {
       fontSize: "0.8rem",
