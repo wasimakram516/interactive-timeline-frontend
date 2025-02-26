@@ -236,6 +236,7 @@ export default function BigScreenPage() {
                 left: `${year.xPosition}%`,
                 top: `${year.yPosition}%`,
                 transform: "translate(-50%, -50%)",
+                zIndex: isActive ? 20 : 1,
               }}
             >
               {/* Year Bubble */}
@@ -518,6 +519,7 @@ export default function BigScreenPage() {
                 left: `${program.xPosition}%`,
                 top: `${program.yPosition}%`,
                 transform: "translate(-50%, -50%)",
+                zIndex: isActive ? 20 : 1,
               }}
             >
               {/* Program Bubble */}
