@@ -43,7 +43,7 @@ export default function useWebSocketBigScreen() {
       setTimeout(() => {
         setSelectedEvent(eventData); // Set event data after delay
         setIsLoading(false); // Stop loading
-      }, 2000); // Simulate a 2-second loading delay
+      }, 1000);
     });
 
     // ✅ Listen for selected program event
@@ -53,7 +53,7 @@ export default function useWebSocketBigScreen() {
       setTimeout(() => {
         setSelectedProgram(programData); // Set program data after delay
         setIsLoading(false); // Stop loading
-      }, 2000); // Simulate a 2-second loading delay
+      }, 1000);
     });
 
     setSocket(socketInstance);
