@@ -49,11 +49,7 @@ export default function useWebSocketBigScreen() {
     // ✅ Listen for selected program event
     socketInstance.on("animateProgram", (programData) => {
       console.log(`📜 Program received for title: ${programData?.title || "null"}`);
-      setIsLoading(true); // Start loading
-      setTimeout(() => {
-        setSelectedProgram(programData); // Set program data after delay
-        setIsLoading(false); // Stop loading
-      }, 1000);
+      setSelectedProgram(programData); 
     });
 
     setSocket(socketInstance);
