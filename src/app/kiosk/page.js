@@ -73,7 +73,7 @@ export default function KioskSelection() {
           color="warning"
           size="large"
           startIcon={<ScreenShareIcon />}
-          onClick={() => router.push("/kiosk/controller-3")}
+          onClick={() => router.push("/kiosk/controller-4")}
         >
           Controller 4 (Programs)
         </Button>
